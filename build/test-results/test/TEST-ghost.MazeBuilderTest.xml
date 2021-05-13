@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="ghost.MazeBuilderTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2020-11-16T11:40:33" hostname="OWYA-PC" time="0.084">
+  <properties/>
+  <testcase name="constructorTest()" classname="ghost.MazeBuilderTest" time="0.002"/>
+  <testcase name="constructList()" classname="ghost.MazeBuilderTest" time="0.017"/>
+  <testcase name="buildTest()" classname="ghost.MazeBuilderTest" time="0.061"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

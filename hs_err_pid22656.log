@@ -1,0 +1,162 @@
+#
+# There is insufficient memory for the Java Runtime Environment to continue.
+# Native memory allocation (malloc) failed to allocate 1048576 bytes for AllocateHeap
+# Possible reasons:
+#   The system is out of physical RAM or swap space
+#   The process is running with CompressedOops enabled, and the Java Heap may be blocking the growth of the native heap
+# Possible solutions:
+#   Reduce memory load on the system
+#   Increase physical memory or swap space
+#   Check if swap backing store is full
+#   Decrease Java heap size (-Xmx/-Xms)
+#   Decrease number of Java threads
+#   Decrease Java thread stack sizes (-Xss)
+#   Set larger code cache with -XX:ReservedCodeCacheSize=
+#   JVM is running with Unscaled Compressed Oops mode in which the Java heap is
+#     placed in the first 4GB address space. The Java Heap base address is the
+#     maximum limit for the native heap growth. Please use -XX:HeapBaseMinAddress
+#     to set the Java Heap base and to place the Java Heap above 4GB virtual address.
+# This output file may be truncated or incomplete.
+#
+#  Out of Memory Error (memory/allocation.inline.hpp:61), pid=22656, tid=0x0000000000002580
+#
+# JRE version:  (8.0_265-b01) (build )
+# Java VM: OpenJDK 64-Bit Server VM (25.265-b01 mixed mode windows-amd64 compressed oops)
+# Failed to write core dump. Minidumps are not enabled by default on client versions of Windows
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x0000000002c02800):  JavaThread "Unknown thread" [_thread_in_vm, id=9600, stack(0x0000000002b00000,0x0000000002c00000)]
+
+Stack: [0x0000000002b00000,0x0000000002c00000]
+[error occurred during error reporting (printing stack bounds), id 0xc0000005]
+
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+
+
+---------------  P R O C E S S  ---------------
+
+Java Threads: ( => current thread )
+
+Other Threads:
+
+=>0x0000000002c02800 (exited) JavaThread "Unknown thread" [_thread_in_vm, id=9600, stack(0x0000000002b00000,0x0000000002c00000)]
+
+VM state:not at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread: None
+
+heap address: 0x00000000fc000000, size: 64 MB, Compressed Oops mode: 32-bit
+Narrow klass base: 0x0000000000000000, Narrow klass shift: 3
+Compressed class space size: 1073741824 Address: 0x0000000100000000
+
+Heap:
+ PSYoungGen      total 18944K, used 327K [0x00000000feb00000, 0x0000000100000000, 0x0000000100000000)
+  eden space 16384K, 2% used [0x00000000feb00000,0x00000000feb51ec8,0x00000000ffb00000)
+  from space 2560K, 0% used [0x00000000ffd80000,0x00000000ffd80000,0x0000000100000000)
+  to   space 2560K, 0% used [0x00000000ffb00000,0x00000000ffb00000,0x00000000ffd80000)
+ ParOldGen       total 44032K, used 0K [0x00000000fc000000, 0x00000000feb00000, 0x00000000feb00000)
+  object space 44032K, 0% used [0x00000000fc000000,0x00000000fc000000,0x00000000feb00000)
+ Metaspace       used 783K, capacity 4480K, committed 4480K, reserved 1056768K
+  class space    used 76K, capacity 384K, committed 384K, reserved 1048576K
+
+Card table byte_map: [0x0000000002a20000,0x0000000002a50000] byte_map_base: 0x0000000002240000
+
+Marking Bits: (ParMarkBitMap*) 0x0000000052b98810
+ Begin Bits: [0x00000000124c0000, 0x00000000125c0000)
+ End Bits:   [0x00000000125c0000, 0x00000000126c0000)
+
+Polling page: 0x00000000028d0000
+
+CodeCache: size=245760Kb used=329Kb max_used=329Kb free=245430Kb
+ bounds [0x0000000002d00000, 0x0000000002f70000, 0x0000000011d00000]
+ total_blobs=59 nmethods=0 adapters=40
+ compilation: enabled
+
+Compilation events (0 events):
+No events
+
+GC Heap History (0 events):
+No events
+
+Deoptimization events (0 events):
+No events
+
+Classes redefined (0 events):
+No events
+
+Internal exceptions (0 events):
+No events
+
+Events (10 events):
+Event: 0.030 loading class java/lang/Short
+Event: 0.030 loading class java/lang/Short done
+Event: 0.030 loading class java/lang/Integer
+Event: 0.031 loading class java/lang/Integer done
+Event: 0.031 loading class java/lang/Long
+Event: 0.031 loading class java/lang/Long done
+Event: 0.032 loading class java/lang/NullPointerException
+Event: 0.032 loading class java/lang/NullPointerException done
+Event: 0.032 loading class java/lang/ArithmeticException
+Event: 0.032 loading class java/lang/ArithmeticException done
+
+
+Dynamic libraries:
+0x00007ff6089f0000 - 0x00007ff608a25000 	C:\Program Files\Amazon Corretto\jdk1.8.0_265\bin\java.exe
+0x00007ffd36df0000 - 0x00007ffd36fe6000 	C:\WINDOWS\SYSTEM32\ntdll.dll
+0x00007ffd35210000 - 0x00007ffd352cd000 	C:\WINDOWS\System32\KERNEL32.DLL
+0x00007ffd34830000 - 0x00007ffd34af8000 	C:\WINDOWS\System32\KERNELBASE.dll
+0x00007ffd36d00000 - 0x00007ffd36daa000 	C:\WINDOWS\System32\ADVAPI32.dll
+0x00007ffd34f90000 - 0x00007ffd3502e000 	C:\WINDOWS\System32\msvcrt.dll
+0x00007ffd36440000 - 0x00007ffd364db000 	C:\WINDOWS\System32\sechost.dll
+0x00007ffd34e60000 - 0x00007ffd34f84000 	C:\WINDOWS\System32\RPCRT4.dll
+0x00007ffd35e20000 - 0x00007ffd35fc0000 	C:\WINDOWS\System32\USER32.dll
+0x00007ffd34c00000 - 0x00007ffd34c22000 	C:\WINDOWS\System32\win32u.dll
+0x00007ffd36ab0000 - 0x00007ffd36ada000 	C:\WINDOWS\System32\GDI32.dll
+0x00007ffd34720000 - 0x00007ffd34829000 	C:\WINDOWS\System32\gdi32full.dll
+0x00007ffd34c30000 - 0x00007ffd34ccd000 	C:\WINDOWS\System32\msvcp_win.dll
+0x00007ffd34b00000 - 0x00007ffd34c00000 	C:\WINDOWS\System32\ucrtbase.dll
+0x00007ffd20540000 - 0x00007ffd207db000 	C:\WINDOWS\WinSxS\amd64_microsoft.windows.common-controls_6595b64144ccf1df_6.0.19041.488_none_ca04af081b815d21\COMCTL32.dll
+0x00007ffd353b0000 - 0x00007ffd353e0000 	C:\WINDOWS\System32\IMM32.DLL
+0x0000000053210000 - 0x00000000532e2000 	C:\Program Files\Amazon Corretto\jdk1.8.0_265\jre\bin\msvcr100.dll
+0x0000000052360000 - 0x0000000052c1a000 	C:\Program Files\Amazon Corretto\jdk1.8.0_265\jre\bin\server\jvm.dll
+0x00007ffd36cf0000 - 0x00007ffd36cf8000 	C:\WINDOWS\System32\PSAPI.DLL
+0x00007ffd2e6e0000 - 0x00007ffd2e6ea000 	C:\WINDOWS\SYSTEM32\VERSION.dll
+0x00007ffd273e0000 - 0x00007ffd27407000 	C:\WINDOWS\SYSTEM32\WINMM.dll
+0x00007ffd20940000 - 0x00007ffd20949000 	C:\WINDOWS\SYSTEM32\WSOCK32.dll
+0x00007ffd36610000 - 0x00007ffd3667b000 	C:\WINDOWS\System32\WS2_32.dll
+0x00007ffd2fd40000 - 0x00007ffd2fd4f000 	C:\Program Files\Amazon Corretto\jdk1.8.0_265\jre\bin\verify.dll
+0x00007ffd1dac0000 - 0x00007ffd1dae9000 	C:\Program Files\Amazon Corretto\jdk1.8.0_265\jre\bin\java.dll
+0x00007ffd1db10000 - 0x00007ffd1db26000 	C:\Program Files\Amazon Corretto\jdk1.8.0_265\jre\bin\zip.dll
+
+VM Arguments:
+jvm_args: -Xmx64m -Xms64m -Dorg.gradle.appname=gradle 
+java_command: org.gradle.launcher.GradleMain run --warning-mode all
+java_class_path (initial): C:\Gradle\gradle-6.7\lib\gradle-launcher-6.7.jar
+Launcher Type: SUN_STANDARD
+
+Environment Variables:
+JAVA_HOME=C:\Program Files\Amazon Corretto\jdk1.8.0_265
+CLASSPATH=C:\Gradle\gradle-6.7\lib\gradle-launcher-6.7.jar
+PATH=C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Program Files\Amazon Corretto\jdk1.8.0_265\bin;C:\ProgramData\Oracle\Java\javapath;C:\Program Files (x86)\Intel\iCLS Client\;C:\Program Files\Intel\iCLS Client\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files (x86)\Skype\Phone\;C:\Program Files (x86)\Windows Live\Shared;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Gradle\gradle-6.7\bin;C:\Program Files\Amazon Corretto\jdk1.8.0_265;C:\Users\Owen Yang\AppData\Local\Microsoft\WindowsApps;C:\Users\Owen Yang\AppData\Local\Programs\Microsoft VS Code\bin;C:\Program Files\Amazon Corretto\jdk1.8.0_265\bin;
+USERNAME=Owen
+OS=Windows_NT
+PROCESSOR_IDENTIFIER=Intel64 Family 6 Model 60 Stepping 3, GenuineIntel
+
+
+
+---------------  S Y S T E M  ---------------
+
+OS: Windows 10.0 , 64 bit Build 19041 (10.0.19041.546)
+
+CPU:total 4 (initial active 4) (4 cores per cpu, 1 threads per core) family 6 model 60 stepping 3, cmov, cx8, fxsr, mmx, sse, sse2, sse3, ssse3, sse4.1, sse4.2, popcnt, avx, avx2, aes, clmul, erms, lzcnt, tsc, tscinvbit, bmi1, bmi2
+
+Memory: 4k page, physical 8321476k(454232k free), swap 33487300k(6332k free)
+
+vm_info: OpenJDK 64-Bit Server VM (25.265-b01) for windows-amd64 JRE (1.8.0_265-b01), built on Jul 28 2020 21:14:30 by "Administrator" with MS VC++ 10.0 (VS2010)
+
+time: Wed Nov 04 23:15:15 2020
+timezone: AUS Eastern Daylight Time
+elapsed time: 0 seconds (0d 0h 0m 0s)
+

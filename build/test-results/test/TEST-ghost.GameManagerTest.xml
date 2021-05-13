@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="ghost.GameManagerTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2020-11-16T11:40:32" hostname="OWYA-PC" time="1.038">
+  <properties/>
+  <testcase name="constructorTest()" classname="ghost.GameManagerTest" time="0.031"/>
+  <testcase name="resetAllTest()" classname="ghost.GameManagerTest" time="0.015"/>
+  <testcase name="winLoseScreenTest()" classname="ghost.GameManagerTest" time="0.421"/>
+  <testcase name="openMouthLogicTest()" classname="ghost.GameManagerTest" time="0.012"/>
+  <testcase name="readConfigFileTest()" classname="ghost.GameManagerTest" time="0.006"/>
+  <testcase name="instantiateObjectsTest()" classname="ghost.GameManagerTest" time="0.007"/>
+  <testcase name="buildMapTest()" classname="ghost.GameManagerTest" time="0.005"/>
+  <testcase name="loadImagesTest()" classname="ghost.GameManagerTest" time="0.489"/>
+  <testcase name="keyPressedCallTest()" classname="ghost.GameManagerTest" time="0.015"/>
+  <testcase name="instantiateGhostObjectsTest()" classname="ghost.GameManagerTest" time="0.03"/>
+  <system-out><![CDATA[7
+7
+7
+7
+7
+Nope2
+Nope
+7
+7
+7
+7
+7
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

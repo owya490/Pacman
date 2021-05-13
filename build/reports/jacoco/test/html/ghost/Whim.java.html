@@ -1,0 +1,477 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Whim.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Milestone</a> &gt; <a href="index.source.html" class="el_package">ghost</a> &gt; <span class="el_source">Whim.java</span></div><h1>Whim.java</h1><pre class="source lang-java linenums">package ghost;
+import processing.core.PApplet;
+import processing.core.PImage;
+import java.util.*;
+import java.io.*;
+import org.json.simple.JSONArray; 
+import org.json.simple.JSONObject; 
+import java.lang.*;
+
+public class Whim extends GhostObject {
+
+    /**
+     * The sprite for the Ghost
+     */
+    private PImage ghost;
+    /**
+     * Marks the amount of possible paths the Ghost can take at a given moment
+     */
+<span class="fc" id="L19">    private int check = 0;</span>
+    /**
+     * The corner destination for the Ghost
+     */
+<span class="fc" id="L23">    private int[] corner_a = new int[2];</span>
+    /** 
+     * List of all chasers GhostObjects in the game state
+     */
+<span class="fc" id="L27">    private ArrayList&lt;GhostObject&gt; chasers = new ArrayList&lt;GhostObject&gt;();</span>
+    /**
+     * The current chaser the whim is basing its destination calcualtions off
+     */
+    private GhostObject current_chaser;
+    /**
+     * The adjusted player x coordinates to 2 spaces in the same vector as the chaser infront of the waka
+     */
+    private int temp_player_x;
+    /**
+     * The adjusted player y coordinates to 2 spaces in the same vector as the chaser infront of the waka
+     */
+    private int temp_player_y;
+    /**
+     * The x destination of the Ghost
+     */
+    private int x_dest;
+    /**
+     * The y destination of the Ghost
+     */
+    private int y_dest;
+    /**
+     * The target destination of the Ghost
+     */
+<span class="fc" id="L51">    private int[] target = new int[2];</span>
+    /**
+     * Marks whether the whim ghost is in temporary scatter due to no chasers
+     */
+<span class="fc" id="L55">    private boolean tempScatter = false;</span>
+    
+    
+    /**
+     * The constructor for the Ambusher Ghost
+     * @param sodaGhost The sprite for the soda affected Ghosts
+     * @param x The X coordinates of Ghost
+     * @param y The Y coordinates of Ghost
+     * @param ghost The sprite for the Ghost
+     * @param ghost_scared The sprite for frightened Ghost
+     * @param modeLengths1 The mode Length array for the Ghost Scatter mode
+     * @param speed The speed of the Ghost
+     * @param path The traversable path 
+     * @param player_g The player object in the game
+     * @param other_ghosts The other ghost objects in the game
+     * @param frightenedLength The length of being frightened for the Ghost
+     * @param sodaLength The length of being affected by soda for the Ghost
+     */
+<span class="fc" id="L73">    public Whim(PImage sodaGhost, int x, int y, PImage ghost, PImage ghost_scared, ArrayList&lt;Integer&gt; modeLengths1, int speed, boolean[][] path, Player player_g, ArrayList&lt;GhostObject&gt; other_ghosts, int frightenedLength, int sodaLength){</span>
+<span class="fc" id="L74">        this.sodaGhost = sodaGhost;</span>
+<span class="fc" id="L75">        this.sodaLength = sodaLength;</span>
+
+<span class="fc" id="L77">        this.other_ghosts = other_ghosts;</span>
+<span class="fc" id="L78">        this.frightenedLength = frightenedLength;</span>
+
+<span class="fc" id="L80">        this.ghost_scared = ghost_scared;</span>
+<span class="fc" id="L81">        this.ghost = ghost;</span>
+<span class="fc" id="L82">        this.modeLengths1 = modeLengths1;</span>
+<span class="fc" id="L83">        this.x_beg = x*16-4;</span>
+<span class="fc" id="L84">        this.y_beg = y*16-5;</span>
+<span class="fc" id="L85">        this.x = x*16-4;</span>
+<span class="fc" id="L86">        this.y = y*16-5;</span>
+<span class="fc" id="L87">        this.speed = speed;</span>
+<span class="fc" id="L88">        this.path = path;</span>
+<span class="fc" id="L89">        this.player_g = player_g;</span>
+<span class="fc" id="L90">        this.player_x = player_g.getX();</span>
+<span class="fc" id="L91">        this.player_y = player_g.getY();</span>
+<span class="fc" id="L92">        this.modeLengths_f = new int[modeLengths1.size()];</span>
+<span class="fc" id="L93">        int accumul = 0;</span>
+<span class="fc" id="L94">        int index =0;</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">        for (int i : modeLengths1) {</span>
+<span class="fc" id="L96">            accumul += i*60;</span>
+<span class="fc" id="L97">            modeLengths_f[index] = accumul;</span>
+<span class="fc" id="L98">            index ++;</span>
+<span class="fc" id="L99">        }</span>
+
+<span class="fc" id="L101">    }</span>
+
+    /**
+     * Handles the Logic of the Ghost Object
+     */
+    public void tick(char input) {
+<span class="fc bfc" id="L107" title="All 2 branches covered.">        for (GhostObject g : this.other_ghosts) {</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">            if (Chaser.class.isInstance(g)) {</span>
+<span class="fc" id="L109">                this.chasers.add(g);</span>
+            }
+<span class="fc" id="L111">        }</span>
+<span class="fc" id="L112">        int deathIndex = 0;</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">        for (GhostObject g : this.chasers) {</span>
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">            if (g.isDead == false) {</span>
+<span class="fc" id="L115">                this.current_chaser = g;</span>
+<span class="fc" id="L116">                this.tempScatter = false;</span>
+<span class="fc" id="L117">                break;</span>
+            } else {
+<span class="nc" id="L119">                deathIndex ++;</span>
+            }
+<span class="nc bnc" id="L121" title="All 2 branches missed.">            if (deathIndex == this.chasers.size()) {</span>
+<span class="nc" id="L122">                this.tempScatter = true;</span>
+            }
+<span class="nc" id="L124">        }</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">        if (this.isFrightened == true) {</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">            if (this.frightenedFrames == frightenedLength*60) {</span>
+<span class="fc" id="L127">                this.isFrightened = false;</span>
+<span class="fc" id="L128">                this.frightenedFrames = 0;</span>
+
+            } else{
+<span class="fc" id="L131">                this.frightenedFrames ++;</span>
+            }
+<span class="fc bfc" id="L133" title="All 2 branches covered.">        } else if (this.sodaEffect == true) {</span>
+<span class="fc bfc" id="L134" title="All 2 branches covered.">            if (this.sodaFrames == this.sodaLength*60) { //implement soda length</span>
+<span class="fc" id="L135">                this.sodaEffect = false;</span>
+<span class="fc" id="L136">                this.sodaFrames = 0;</span>
+
+            } else{
+<span class="fc" id="L139">                this.sodaFrames ++;</span>
+            }
+        }
+        else {
+<span class="fc" id="L143">            this.frames ++;</span>
+<span class="fc bfc" id="L144" title="All 2 branches covered.">            if (this.index_scatter == modeLengths_f.length) {</span>
+<span class="fc" id="L145">                this.index_scatter =0;</span>
+            }
+<span class="fc bfc" id="L147" title="All 2 branches covered.">            if (this.frames == (modeLengths_f[this.index_scatter])) {</span>
+<span class="fc" id="L148">                setScatter();</span>
+<span class="fc" id="L149">                this.index_scatter ++;</span>
+<span class="fc" id="L150">                System.out.println(this.scatter);</span>
+            }
+            // if (this.index_scatter == modeLengths_f.length -1) {
+            //     this.index_scatter =0;
+            // }
+        }
+
+<span class="fc" id="L157">        this.player_x = player_g.getX();</span>
+<span class="fc" id="L158">        this.player_y = player_g.getY();</span>
+
+<span class="fc bfc" id="L160" title="All 6 branches covered.">        if (this.player_x == this.x &amp; this.player_y == this.y) {</span>
+<span class="pc bpc" id="L161" title="1 of 2 branches missed.">            if (this.isFrightened == true) {</span>
+<span class="fc" id="L162">                this.isDead = true;</span>
+<span class="fc" id="L163">                this.x = this.x_beg;</span>
+<span class="fc" id="L164">                this.y = this.y_beg;</span>
+            }
+<span class="nc bnc" id="L166" title="All 6 branches missed.">            else if(this.isFrightened == false &amp; this.isDead == false) {</span>
+<span class="nc" id="L167">                player_g.setDead(true);</span>
+<span class="nc" id="L168">                this.x = this.x_beg;</span>
+<span class="nc" id="L169">                this.y = this.y_beg;</span>
+<span class="nc" id="L170">                this.setAllDead();</span>
+            }
+        }
+<span class="fc bfc" id="L173" title="All 6 branches covered.">        else if (Math.abs(this.player_x - this.x) &lt;= 16 &amp; this.player_y == this.y) {</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">            if (this.isFrightened == true) {</span>
+<span class="fc" id="L175">                this.isDead = true;</span>
+<span class="fc" id="L176">                this.x = this.x_beg;</span>
+<span class="fc" id="L177">                this.y = this.y_beg;</span>
+            }
+<span class="pc bpc" id="L179" title="3 of 6 branches missed.">            else if(this.isFrightened == false &amp; this.isDead == false) {</span>
+<span class="fc" id="L180">                player_g.setDead(true);</span>
+<span class="fc" id="L181">                this.x = this.x_beg;</span>
+<span class="fc" id="L182">                this.y = this.y_beg;</span>
+<span class="fc" id="L183">                this.setAllDead();</span>
+            }
+        }
+<span class="fc bfc" id="L186" title="All 6 branches covered.">        else if (this.player_x == this.x &amp; Math.abs(this.player_y - this.y) &lt;= 16) {</span>
+<span class="fc bfc" id="L187" title="All 2 branches covered.">            if (this.isFrightened == true) {</span>
+<span class="fc" id="L188">                this.isDead = true;</span>
+<span class="fc" id="L189">                this.x = this.x_beg;</span>
+<span class="fc" id="L190">                this.y = this.y_beg;</span>
+            }
+<span class="pc bpc" id="L192" title="3 of 6 branches missed.">            else if(this.isFrightened == false &amp; this.isDead == false) {</span>
+<span class="fc" id="L193">                player_g.setDead(true);</span>
+<span class="fc" id="L194">                this.x = this.x_beg;</span>
+<span class="fc" id="L195">                this.y = this.y_beg;</span>
+<span class="fc" id="L196">                this.setAllDead();</span>
+            }
+        }
+
+
+<span class="fc bfc" id="L201" title="All 2 branches covered.">        if (path[y][x+1] == true) {</span>
+<span class="fc" id="L202">            check ++;</span>
+        }
+<span class="fc bfc" id="L204" title="All 2 branches covered.">        if (path[y][x-1] == true) {</span>
+<span class="fc" id="L205">            check ++;</span>
+        }
+<span class="fc bfc" id="L207" title="All 2 branches covered.">        if (path[y+1][x] == true) {</span>
+<span class="fc" id="L208">            check ++;</span>
+        }
+<span class="fc bfc" id="L210" title="All 2 branches covered.">        if (path[y-1][x] == true) {</span>
+<span class="fc" id="L211">            check ++;</span>
+        }
+<span class="fc bfc" id="L213" title="All 2 branches covered.">        if (check &gt; 2) {</span>
+                
+            char[] tmp;
+<span class="pc bpc" id="L216" title="1 of 2 branches missed.">            if (this.isFrightened == true) {</span>
+<span class="nc" id="L217">                tmp = upOrDownRandom();</span>
+            }
+<span class="pc bpc" id="L219" title="1 of 6 branches missed.">            else if (this.scatter == true | this.tempScatter == true) {</span>
+<span class="fc" id="L220">                tmp = upOrDownCorner();</span>
+
+            } else {
+<span class="fc" id="L223">                tmp = upOrDown();</span>
+            }
+<span class="pc bpc" id="L225" title="2 of 8 branches missed.">            if (path[y][x+1] == true &amp; this.direction != 'a' &amp; tmp[0] == 'd') {</span>
+<span class="nc" id="L226">                this.direction = 'd';</span>
+            }
+<span class="fc bfc" id="L228" title="All 8 branches covered.">            else if (path[y][x-1] == true &amp; this.direction != 'd' &amp; tmp[0] == 'a') {</span>
+<span class="fc" id="L229">                this.direction = 'a';</span>
+            }
+<span class="pc bpc" id="L231" title="1 of 8 branches missed.">            else if (path[y+1][x] == true &amp; this.direction != 'w' &amp; tmp[0] == 's') {</span>
+<span class="nc" id="L232">                this.direction = 's';</span>
+            }
+<span class="pc bpc" id="L234" title="1 of 8 branches missed.">            else if (path[y-1][x] == true &amp; this.direction != 's' &amp; tmp[0] == 'w') {</span>
+<span class="fc" id="L235">                this.direction = 'w';</span>
+            }
+<span class="pc bpc" id="L237" title="1 of 8 branches missed.">            else if (path[y][x+1] == true &amp; this.direction != 'a' &amp; tmp[2] == 'd') {</span>
+<span class="nc" id="L238">                this.direction = 'd';</span>
+            }
+<span class="pc bpc" id="L240" title="1 of 8 branches missed.">            else if (path[y][x-1] == true &amp; this.direction != 'd' &amp; tmp[2] == 'a') {</span>
+<span class="fc" id="L241">                this.direction = 'a';</span>
+            }
+<span class="pc bpc" id="L243" title="3 of 8 branches missed.">            else if (path[y+1][x] == true &amp; this.direction != 'w' &amp; tmp[2] == 's') {</span>
+<span class="nc" id="L244">                this.direction = 's';</span>
+            }
+<span class="pc bpc" id="L246" title="3 of 8 branches missed.">            else if (path[y-1][x] == true &amp; this.direction != 's' &amp; tmp[2] == 'w') {</span>
+<span class="nc" id="L247">                this.direction = 'w';</span>
+            }
+
+<span class="fc" id="L250">            check = 0;</span>
+
+<span class="fc" id="L252">        } else {</span>
+<span class="fc bfc" id="L253" title="All 6 branches covered.">            if (path[y][x+1] == true &amp; this.direction != 'a') {</span>
+<span class="fc" id="L254">                this.direction = 'd';</span>
+            }
+<span class="pc bpc" id="L256" title="1 of 6 branches missed.">            else if (path[y][x-1] == true &amp; this.direction != 'd') {</span>
+<span class="fc" id="L257">                this.direction = 'a';</span>
+            }
+<span class="fc bfc" id="L259" title="All 6 branches covered.">            else if (path[y+1][x] == true &amp; this.direction != 'w') {</span>
+<span class="fc" id="L260">                this.direction = 's';</span>
+            }
+<span class="pc bpc" id="L262" title="1 of 6 branches missed.">            else if (path[y-1][x] == true &amp; this.direction != 's') {</span>
+<span class="fc" id="L263">                this.direction = 'w';</span>
+            }
+            else {
+<span class="pc bpc" id="L266" title="1 of 2 branches missed.">                if (path[y][x+1] == true) {</span>
+<span class="nc" id="L267">                    this.direction = 'd';</span>
+<span class="pc bpc" id="L268" title="1 of 2 branches missed.">                } else if (path[y][x-1] == true) {</span>
+<span class="nc" id="L269">                    this.direction = 'a';</span>
+<span class="pc bpc" id="L270" title="1 of 2 branches missed.">                } else if (path[y+1][x] == true) {</span>
+<span class="nc" id="L271">                    this.direction = 's';</span>
+<span class="pc bpc" id="L272" title="1 of 2 branches missed.">                } else if (path[y-1][x] == true) {</span>
+<span class="nc" id="L273">                    this.direction = 'w';</span>
+                }
+            }
+<span class="fc" id="L276">            check = 0;</span>
+        }
+<span class="fc bfc" id="L278" title="All 2 branches covered.">        if (this.direction == 'w') {</span>
+<span class="fc" id="L279">            this.yvel = -speed;</span>
+<span class="fc" id="L280">            this.xvel =0;</span>
+        }
+<span class="fc bfc" id="L282" title="All 2 branches covered.">        if (this.direction == 'a') {</span>
+<span class="fc" id="L283">            this.xvel = -speed;</span>
+<span class="fc" id="L284">            this.yvel =0;</span>
+
+        }
+<span class="fc bfc" id="L287" title="All 2 branches covered.">        if (this.direction == 's') {</span>
+<span class="fc" id="L288">            this.yvel = speed;</span>
+<span class="fc" id="L289">            this.xvel =0;</span>
+        }
+<span class="fc bfc" id="L291" title="All 2 branches covered.">        if (this.direction == 'd') {</span>
+<span class="fc" id="L292">            this.xvel = speed;</span>
+<span class="fc" id="L293">            this.yvel =0;</span>
+        }
+
+<span class="fc bfc" id="L296" title="All 2 branches covered.">        if (path[this.y + this.yvel][this.x + this.xvel] == true) {</span>
+<span class="fc" id="L297">            this.x += this.xvel;</span>
+<span class="fc" id="L298">            this.y += this.yvel;</span>
+        }
+<span class="fc" id="L300">    }</span>
+
+    /**
+     * Method for Ghost to determine which way to go at an intersection to reach its desired corner
+     * @return a character array detailing the best moves
+     */
+    public char[] upOrDownCorner() {
+<span class="fc" id="L307">        char[] char_ret = new char[4];</span>
+<span class="fc" id="L308">        int[] corner = new int[2];</span>
+<span class="fc" id="L309">        this.corner_a = corner;</span>
+<span class="fc" id="L310">        corner[0] = 576;</span>
+<span class="fc" id="L311">        corner[1] = 448; </span>
+<span class="fc" id="L312">        int x_diff = this.x - corner[1];</span>
+<span class="fc" id="L313">        int y_diff = this.y - corner[0];</span>
+<span class="fc" id="L314">        int x_diff_f = Math.abs(x_diff);</span>
+<span class="fc" id="L315">        int y_diff_f = Math.abs(y_diff);</span>
+        
+<span class="fc bfc" id="L317" title="All 2 branches covered.">        if (x_diff_f &gt;= y_diff_f) {</span>
+<span class="fc bfc" id="L318" title="All 2 branches covered.">            if (x_diff &gt;= 0 ) {</span>
+<span class="fc" id="L319">                char_ret[0] = 'a';</span>
+<span class="fc" id="L320">                char_ret[1] = 'd';</span>
+            } else {
+<span class="fc" id="L322">                char_ret[0] = 'd';</span>
+<span class="fc" id="L323">                char_ret[1] = 'a';</span>
+            }
+<span class="fc bfc" id="L325" title="All 2 branches covered.">            if (y_diff &gt;= 0 ) {</span>
+<span class="fc" id="L326">                char_ret[2] = 'w';</span>
+<span class="fc" id="L327">                char_ret[3] = 's';</span>
+            } else {
+<span class="fc" id="L329">                char_ret[2] = 's';</span>
+<span class="fc" id="L330">                char_ret[3] = 'w';</span>
+            }
+        } else {
+<span class="fc bfc" id="L333" title="All 2 branches covered.">            if (y_diff &gt;= 0 ) {</span>
+<span class="fc" id="L334">                char_ret[0] = 'w';</span>
+<span class="fc" id="L335">                char_ret[1] = 's';</span>
+            } else {
+<span class="fc" id="L337">                char_ret[0] = 's';</span>
+<span class="fc" id="L338">                char_ret[1] = 'w';</span>
+            }
+<span class="fc bfc" id="L340" title="All 2 branches covered.">            if (x_diff &gt;= 0 ) {</span>
+<span class="fc" id="L341">                char_ret[2] = 'a';</span>
+<span class="fc" id="L342">                char_ret[3] = 'd';</span>
+            } else {
+<span class="fc" id="L344">                char_ret[2] = 'd';</span>
+<span class="fc" id="L345">                char_ret[3] = 'a';</span>
+            }
+        }
+
+<span class="fc" id="L349">        return char_ret;</span>
+
+    }
+
+    /**
+     * Method for Ghost to determine which way to go at an intersection to reach the targeted destination
+     * @return a character array detailing the best moves
+     */
+    public char[] upOrDown() {
+<span class="fc" id="L358">        char[] char_ret = new char[4];</span>
+<span class="fc bfc" id="L359" title="All 2 branches covered.">        if (this.player_g.getDirection() == 'd') {</span>
+<span class="fc" id="L360">            this.temp_player_x = player_x + 32;</span>
+<span class="fc" id="L361">            this.temp_player_y = player_y;</span>
+        }
+<span class="fc bfc" id="L363" title="All 2 branches covered.">        else if (this.player_g.getDirection() == 'a') {</span>
+<span class="fc" id="L364">            this.temp_player_x = player_x - 32;</span>
+<span class="fc" id="L365">            this.temp_player_y = player_y;</span>
+        }
+<span class="fc bfc" id="L367" title="All 2 branches covered.">        else if (this.player_g.getDirection() == 'w') {</span>
+<span class="fc" id="L368">            this.temp_player_x = player_x;</span>
+<span class="fc" id="L369">            this.temp_player_y = player_y - 32;</span>
+        }
+<span class="fc bfc" id="L371" title="All 2 branches covered.">        else if (this.player_g.getDirection() == 's') {</span>
+<span class="fc" id="L372">            this.temp_player_x = player_x;</span>
+<span class="fc" id="L373">            this.temp_player_y = player_y + 32;</span>
+        }
+        
+<span class="fc" id="L376">        int x_diff = this.temp_player_x - this.current_chaser.getX();</span>
+<span class="fc" id="L377">        int y_diff = this.temp_player_y - this.current_chaser.getY();</span>
+
+<span class="fc" id="L379">        this.x_dest = this.current_chaser.getX() + (2*x_diff);</span>
+<span class="fc" id="L380">        this.y_dest = this.current_chaser.getY() + (2*y_diff);</span>
+<span class="fc bfc" id="L381" title="All 2 branches covered.">        if (this.x_dest &gt; 448) {</span>
+<span class="fc" id="L382">            this.x_dest = 448;</span>
+        }
+<span class="fc bfc" id="L384" title="All 2 branches covered.">        if (this.x_dest &lt; 0) {</span>
+<span class="fc" id="L385">            this.x_dest = 0;</span>
+        }
+<span class="fc bfc" id="L387" title="All 2 branches covered.">        if (this.y_dest &gt; 576) {</span>
+<span class="fc" id="L388">            this.y_dest = 576;</span>
+        }
+<span class="fc bfc" id="L390" title="All 2 branches covered.">        if (this.y_dest &lt; 0) {</span>
+<span class="fc" id="L391">            this.y_dest = 0;</span>
+        }
+
+<span class="fc" id="L394">        this.target[0] = this.y_dest;</span>
+
+<span class="fc" id="L396">        this.target[1] = this.x_dest;</span>
+
+<span class="fc" id="L398">        x_diff = this.x - this.x_dest;</span>
+<span class="fc" id="L399">        int x_diff_f = Math.abs(x_diff);</span>
+<span class="fc" id="L400">        y_diff = this.y - this.y_dest;</span>
+<span class="fc" id="L401">        int y_diff_f = Math.abs(y_diff);</span>
+
+<span class="fc bfc" id="L403" title="All 2 branches covered.">        if (x_diff_f &gt;= y_diff_f) {</span>
+<span class="fc bfc" id="L404" title="All 2 branches covered.">            if (x_diff &gt;= 0 ) {</span>
+<span class="fc" id="L405">                char_ret[0] = 'a';</span>
+<span class="fc" id="L406">                char_ret[1] = 'd';</span>
+            } else {
+<span class="fc" id="L408">                char_ret[0] = 'd';</span>
+<span class="fc" id="L409">                char_ret[1] = 'a';</span>
+            }
+<span class="fc bfc" id="L411" title="All 2 branches covered.">            if (y_diff &gt;= 0 ) {</span>
+<span class="fc" id="L412">                char_ret[2] = 'w';</span>
+<span class="fc" id="L413">                char_ret[3] = 's';</span>
+            } else {
+<span class="fc" id="L415">                char_ret[2] = 's';</span>
+<span class="fc" id="L416">                char_ret[3] = 'w';</span>
+            }
+        } else {
+<span class="fc bfc" id="L419" title="All 2 branches covered.">            if (y_diff &gt;= 0 ) {</span>
+<span class="fc" id="L420">                char_ret[0] = 'w';</span>
+<span class="fc" id="L421">                char_ret[1] = 's';</span>
+            } else {
+<span class="fc" id="L423">                char_ret[0] = 's';</span>
+<span class="fc" id="L424">                char_ret[1] = 'w';</span>
+            }
+<span class="fc bfc" id="L426" title="All 2 branches covered.">            if (x_diff &gt;= 0 ) {</span>
+<span class="fc" id="L427">                char_ret[2] = 'a';</span>
+<span class="fc" id="L428">                char_ret[3] = 'd';</span>
+            } else {
+<span class="fc" id="L430">                char_ret[2] = 'd';</span>
+<span class="fc" id="L431">                char_ret[3] = 'a';</span>
+            }
+        }
+
+<span class="fc" id="L435">        return char_ret;</span>
+    }
+
+    /**
+     * Sets the whims current chaser to a new chaser GhostObject
+     * @param c the new chaser GhostObject
+     * @return whether or not it has successfully updated the current chaser for whim
+     */
+    public boolean setCurrentChaser(GhostObject c) {
+<span class="fc" id="L444">        this.current_chaser = c;</span>
+<span class="fc" id="L445">        return true;</span>
+    }
+
+    /**
+     * Draws the Chaser Object to the screen
+     */
+    public void draw (PApplet app) {
+<span class="pc bpc" id="L452" title="1 of 2 branches missed.">        if (this.isDead == false) {</span>
+<span class="pc bpc" id="L453" title="2 of 4 branches missed.">            if (this.debug &amp; this.isFrightened == false) {</span>
+<span class="nc bnc" id="L454" title="All 6 branches missed.">                if (this.scatter == false &amp; this.tempScatter == false) {</span>
+<span class="nc" id="L455">                    app.stroke(255, 255, 255);</span>
+<span class="nc" id="L456">                    upOrDown();</span>
+<span class="nc" id="L457">                    app.line(this.x+13, this.y+13, this.target[1]+13, this.target[0]+13);</span>
+                }
+<span class="nc bnc" id="L459" title="All 6 branches missed.">                else if (this.scatter == true | this.tempScatter == true) {</span>
+<span class="nc" id="L460">                    app.stroke(255, 255, 255);</span>
+<span class="nc" id="L461">                    upOrDownCorner();</span>
+<span class="nc" id="L462">                    app.line(this.x+13, this.y+13, this.corner_a[1], this.corner_a[0]);</span>
+                }
+            }
+<span class="pc bpc" id="L465" title="1 of 2 branches missed.">            if (this.isFrightened == true) {</span>
+<span class="nc" id="L466">                app.image(this.ghost_scared, this.x-2, this.y);</span>
+
+<span class="pc bpc" id="L468" title="1 of 2 branches missed.">            } else if (this.sodaEffect == true) {</span>
+<span class="nc" id="L469">                app.image(this.sodaGhost, this.x-2, this.y);</span>
+
+            } else {
+<span class="fc" id="L472">                app.image(this.ghost, this.x-2, this.y);</span>
+            }
+        } 
+<span class="fc" id="L475">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

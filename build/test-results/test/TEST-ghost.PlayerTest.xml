@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="ghost.PlayerTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2020-11-16T11:40:33" hostname="OWYA-PC" time="0.011">
+  <properties/>
+  <testcase name="constructorTest()" classname="ghost.PlayerTest" time="0.001"/>
+  <testcase name="getAndSetAttributes()" classname="ghost.PlayerTest" time="0.0"/>
+  <testcase name="tickTest()" classname="ghost.PlayerTest" time="0.009"/>
+  <system-out><![CDATA[red
+red
+red
+red
+red
+red
+red
+red
+hello
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,657 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Milestone</a> &gt; <a href="index.source.html" class="el_package">ghost</a> &gt; <span class="el_source">GameManager.java</span></div><h1>GameManager.java</h1><pre class="source lang-java linenums">package ghost;
+
+import processing.core.PApplet;
+import processing.core.PImage;
+import processing.core.PFont;
+
+import java.util.*;
+import java.io.*;
+
+import processing.event.KeyEvent;
+  
+import org.json.simple.JSONArray; 
+import org.json.simple.JSONObject; 
+import org.json.simple.parser.*;
+
+
+public class GameManager {
+
+    /**
+     * The sprite for a corner facing downLeft
+     */
+    private PImage downLeft;
+    /**
+     * The sprite for a corner facing downRight
+     */
+    private PImage downRight;
+    /**
+     * The sprite for a horizontal wall
+     */
+    private PImage horizontal;
+    /**
+     * The sprite for a corner facing upLeft
+     */
+    private PImage upLeft;
+    /**
+     * The sprite for a corner facing upRight
+     */
+    private PImage upRight;
+    /**
+     * The sprite for a vertical wall
+     */
+    private PImage vertical;
+    /**
+     * The sprite for a fruit Object
+     */
+    private PImage fruit;
+    /**
+     * The sprite for the chaser ghost
+     */
+    private PImage chaser;
+    /**
+     * The sprite for the ambusher ghost
+     */
+    private PImage ambusher;
+    /**
+     * The sprite for the whim ghost
+     */
+    private PImage whim;
+    /**
+     * The sprite for the ignorant ghost
+     */
+    private PImage ignorant;
+    /**
+     * The sprite for the waka with mouth closed
+     */
+    private PImage playerClosed;
+    /**
+     * The sprite for the waka with mouth open facing down
+     */
+    private PImage playerDown;
+    /**
+     * The sprite for the waka with mouth open facing left
+     */
+    private PImage playerLeft;
+    /**
+     * The sprite for the waka with mouth open facing right
+     */
+    private PImage playerRight;
+    /**
+     * The sprite for the waka with mouth open facing up
+     */
+    private PImage playerUp;
+    /**
+     * The sprite for the ghost when frightened
+     */
+    private PImage ghost_scared;
+    /**
+     * The sprite for a superFruit object
+     */
+    private PImage superFruit;
+    /**
+     * The sprite for the gameover screen
+     */
+    private PImage gameover;
+    /**
+     * The sprite for a soda object
+     */
+    private PImage soda;
+    /**
+     * The sprite for the waka when affected by soda
+     */
+    private PImage sodaGhost;
+
+    /**
+     * The font for printing you win to screen
+     */
+    private PFont font;
+
+    /**
+     * The mazebuilder object
+     */
+    private MazeBuilder mb;
+    /**
+     * An array list of string arrays containing cells from the map
+     */
+    private ArrayList&lt;String[]&gt; lines;
+    /**
+     * A 2D array containing cells from the map
+     */
+    private String[][] lines_f;
+    /**
+     * A 2D boolean array containing the traversable path
+     */
+    private boolean[][] mazepath;
+
+    /**
+     * The direction the waka is heading in 
+     */
+    private char direction;
+    /**
+     * An arraylist of all the fruit objects in the map
+     */
+    private ArrayList&lt;Fruit&gt; fruitList;
+    /**
+     * An arraylist of all the superFruit objects in the map
+     */
+    private ArrayList&lt;superFruit&gt; superFruitList;
+    /**
+     * An arraylist of all the soda objects in the map
+     */
+    private ArrayList&lt;soda&gt; sodaList;
+
+    /**
+     * The timer for the end game screen
+     */
+<span class="fc" id="L146">    private int deathTimer = 0;</span>
+
+
+    /**
+     * The player object
+     */
+    private Player player;
+    /** 
+     * An array list containing all the ghost Objects within the game
+     */
+<span class="fc" id="L156">    private ArrayList&lt;GhostObject&gt; ghost_obj = new ArrayList&lt;GhostObject&gt;();</span>
+    /**
+     * The ambusher X starting coordinates
+     */
+    private ArrayList&lt;Integer&gt; ambusher_ghost_x;
+    /**
+     * The ambusher Y starting coordinates
+     */
+    private ArrayList&lt;Integer&gt; ambusher_ghost_y;
+    /**
+     * The chaser X starting coordinates
+     */
+    private ArrayList&lt;Integer&gt; chaser_ghost_x;
+    /**
+     * The chaser Y starting coordinates
+     */
+    private ArrayList&lt;Integer&gt; chaser_ghost_y;
+    /**
+     * The ignorant X starting coordinates
+     */
+    private ArrayList&lt;Integer&gt; ignorant_ghost_x;
+    /**
+     * The ignorant Y starting coordinates
+     */
+    private ArrayList&lt;Integer&gt; ignorant_ghost_y;
+    /**
+     * The whim X starting coordinates
+     */
+    private ArrayList&lt;Integer&gt; whim_ghost_x;
+    /**
+     * The whim Y starting coordinates
+     */
+    private ArrayList&lt;Integer&gt; whim_ghost_y;
+
+    /**
+     * Marks whether the waka's mouth is open or not
+     */
+<span class="fc" id="L193">    private boolean openMouth = false;</span>
+
+    /**
+     * The amount of lives for the player
+     */
+    private int lives;
+    /** 
+     * The speed at which the player/ waka moves
+     */
+    private int speed;
+    /** 
+     * The map.txt filename/ path
+     */
+    private String map;
+    /** 
+     * The modeLengths for the scatter mode of ghosts
+     */
+    private JSONArray modeLengths1;
+    /** 
+     * The modeLengths for the scatter mode of ghosts in an array list
+     */
+    private ArrayList&lt;Integer&gt; modeLengths_i_f;
+    /**
+     * The frightened length of ghosts
+     */
+    private int frightenedLength;
+    /**
+     * The soda effect length on ghosts
+     */
+    private int sodaLength;
+
+    /** 
+     * The current app which through the class draws to the screen
+     */
+    private PApplet app;
+
+    /** 
+     * The total amount of frames that has elapsed
+     */
+    private int n;
+
+
+    /**
+     * The constructor for the GameManager Class
+     */
+<span class="fc" id="L238">    public GameManager() {</span>
+<span class="fc" id="L239">    }</span>
+
+    /**
+     * All the sprites are loaded in and assigned to their attributes
+     * @param app the app through which the sprites are loaded in
+     * @return whether the sprite loading was completed successfully
+     */
+    public boolean loadSprites(PApplet app) {
+<span class="fc" id="L247">        this.app = app;</span>
+<span class="fc" id="L248">        this.downLeft = app.loadImage(&quot;src/main/resources/downLeft.png&quot;);</span>
+<span class="fc" id="L249">        this.downRight = app.loadImage(&quot;src/main/resources/downRight.png&quot;);</span>
+<span class="fc" id="L250">        this.horizontal = app.loadImage(&quot;src/main/resources/horizontal.png&quot;);</span>
+<span class="fc" id="L251">        this.upLeft = app.loadImage(&quot;src/main/resources/upLeft.png&quot;);</span>
+<span class="fc" id="L252">        this.upRight = app.loadImage(&quot;src/main/resources/upRight.png&quot;);</span>
+<span class="fc" id="L253">        this.vertical = app.loadImage(&quot;src/main/resources/vertical.png&quot;);</span>
+<span class="fc" id="L254">        this.fruit = app.loadImage(&quot;src/main/resources/fruit.png&quot;);</span>
+<span class="fc" id="L255">        this.chaser = app.loadImage(&quot;src/main/resources/chaser.png&quot;);</span>
+<span class="fc" id="L256">        this.ambusher = app.loadImage(&quot;src/main/resources/ambusher.png&quot;);</span>
+
+<span class="fc" id="L258">        this.whim = app.loadImage(&quot;src/main/resources/whim.png&quot;);</span>
+
+<span class="fc" id="L260">        this.ignorant = app.loadImage(&quot;src/main/resources/ignorant.png&quot;);</span>
+
+<span class="fc" id="L262">        this.playerClosed = app.loadImage(&quot;src/main/resources/playerClosed.png&quot;);</span>
+<span class="fc" id="L263">        this.playerDown = app.loadImage(&quot;src/main/resources/playerDown.png&quot;);</span>
+<span class="fc" id="L264">        this.playerLeft = app.loadImage(&quot;src/main/resources/playerLeft.png&quot;);</span>
+<span class="fc" id="L265">        this.playerRight = app.loadImage(&quot;src/main/resources/playerRight.png&quot;);</span>
+<span class="fc" id="L266">        this.playerUp = app.loadImage(&quot;src/main/resources/playerUp.png&quot;);</span>
+<span class="fc" id="L267">        this.ghost_scared = app.loadImage(&quot;src/main/resources/frightened.png&quot;);</span>
+<span class="fc" id="L268">        this.superFruit = app.loadImage(&quot;src/main/resources/superFruit.png&quot;);</span>
+<span class="fc" id="L269">        this.gameover = app.loadImage(&quot;src/main/resources/gameover - Copy.png&quot;);</span>
+<span class="fc" id="L270">        this.font = app.createFont(&quot;src/main/resources/PressStart2P-Regular.ttf&quot;, 16);</span>
+<span class="fc" id="L271">        this.soda = app.loadImage(&quot;src/main/resources/soda.png&quot;);</span>
+<span class="fc" id="L272">        this.sodaGhost = app.loadImage(&quot;src/main/resources/sodaGhost.png&quot;);</span>
+<span class="fc" id="L273">        return true;</span>
+    }
+
+    /**
+     * Constructs the game state
+     * Reads the config file, builds the map and instantiates all the objects of the game
+     * @return whether constructing the game was successful
+     */
+    public boolean constructGame() {
+<span class="fc" id="L282">        readConfigFile(&quot;config.json&quot;);</span>
+<span class="fc" id="L283">        buildMap();</span>
+<span class="fc" id="L284">        instantiateObjects();</span>
+<span class="fc" id="L285">        instantiateGhostObjects();</span>
+<span class="fc" id="L286">        return true;</span>
+    }
+
+    /**
+     * Instantiates all the ghost objects in the game
+     * @return whether the ghost objects have been successfully instantiated
+     */
+    public boolean instantiateGhostObjects() {
+<span class="fc" id="L294">        this.ambusher_ghost_x = findGhostStart.ambusherfindx(this.map);</span>
+<span class="fc" id="L295">        this.ambusher_ghost_y = findGhostStart.ambusherfindy(this.map);</span>
+<span class="fc" id="L296">        this.chaser_ghost_x = findGhostStart.chaserfindx(this.map);</span>
+<span class="fc" id="L297">        this.chaser_ghost_y = findGhostStart.chaserfindy(this.map);</span>
+<span class="fc" id="L298">        this.ignorant_ghost_x = findGhostStart.ignorantfindx(this.map);</span>
+<span class="fc" id="L299">        this.ignorant_ghost_y = findGhostStart.ignorantfindy(this.map);</span>
+<span class="fc" id="L300">        this.whim_ghost_x = findGhostStart.whimfindx(this.map);</span>
+<span class="fc" id="L301">        this.whim_ghost_y = findGhostStart.whimfindy(this.map);</span>
+<span class="fc" id="L302">        int index = 0;</span>
+
+<span class="fc bfc" id="L304" title="All 2 branches covered.">        for (Integer g : this.ambusher_ghost_x) {</span>
+<span class="fc" id="L305">            this.ghost_obj.add(new Ambusher(this.sodaGhost, this.ambusher_ghost_x.get(index), this.ambusher_ghost_y.get(index), this.ambusher, this.ghost_scared, this.modeLengths_i_f, this.speed, this.mazepath, this.player, this.ghost_obj, this.frightenedLength, this.sodaLength));</span>
+<span class="fc" id="L306">            index ++;</span>
+<span class="fc" id="L307">        }</span>
+<span class="fc" id="L308">        index = 0;</span>
+<span class="fc bfc" id="L309" title="All 2 branches covered.">        for (Integer g : this.ignorant_ghost_x) {</span>
+<span class="fc" id="L310">            this.ghost_obj.add(new Ignorant(this.sodaGhost, this.ignorant_ghost_x.get(index), this.ignorant_ghost_y.get(index), this.ignorant, this.ghost_scared, this.modeLengths_i_f, this.speed, this.mazepath, this.player, this.ghost_obj, this.frightenedLength, this.sodaLength));</span>
+<span class="fc" id="L311">            index ++;</span>
+<span class="fc" id="L312">        }</span>
+<span class="fc" id="L313">        index = 0;</span>
+
+<span class="fc bfc" id="L315" title="All 2 branches covered.">        for (Integer g : this.chaser_ghost_x) {</span>
+<span class="fc" id="L316">            this.ghost_obj.add(new Chaser(this.sodaGhost, this.chaser_ghost_x.get(index), this.chaser_ghost_y.get(index), this.chaser, this.ghost_scared, this.modeLengths_i_f, this.speed, this.mazepath, this.player, this.ghost_obj, this.frightenedLength, this.sodaLength));</span>
+<span class="fc" id="L317">            index ++;</span>
+<span class="fc" id="L318">        }</span>
+<span class="fc" id="L319">        index = 0;</span>
+
+<span class="fc bfc" id="L321" title="All 2 branches covered.">        for (Integer g : this.whim_ghost_x) {</span>
+<span class="fc" id="L322">            this.ghost_obj.add(new Whim(this.sodaGhost, this.whim_ghost_x.get(index), this.whim_ghost_y.get(index), this.whim, this.ghost_scared, this.modeLengths_i_f, this.speed, this.mazepath, this.player, this.ghost_obj, this.frightenedLength, this.sodaLength));</span>
+<span class="fc" id="L323">            index ++;</span>
+<span class="fc" id="L324">        }</span>
+
+
+<span class="fc bfc" id="L327" title="All 2 branches covered.">        for (GhostObject g : this.ghost_obj) {</span>
+<span class="fc" id="L328">            g.setOtherGhosts(this.ghost_obj);</span>
+<span class="fc" id="L329">        }</span>
+
+<span class="fc" id="L331">        this.player.setGhostObj(this.ghost_obj);</span>
+<span class="fc" id="L332">        return true;</span>
+    }
+
+    /**
+     * Instantiates all the objects in the game
+     * Creates the player and consumable objects
+     * @return whether the objects have been successfully instantiated
+     */
+    public boolean instantiateObjects() {
+<span class="fc" id="L341">        this.fruitList = this.mb.fruitList();</span>
+<span class="fc" id="L342">        this.superFruitList = this.mb.superFruitList();</span>
+<span class="fc" id="L343">        this.sodaList = this.mb.sodaList();</span>
+<span class="fc" id="L344">        this.player = new Player(this.sodaList, this.superFruitList, this.fruitList, this.lines_f, this.mazepath, this.lives, this.speed, this.map, this.playerClosed, this.playerDown, this.playerLeft, this.playerRight, this.playerUp);</span>
+<span class="fc" id="L345">        return true;</span>
+    }
+
+    /**
+     * Reads the map.txt file and constructs the map and the traversable path
+     * @return whether the building of the map has been completed succesfully
+     */
+    public boolean buildMap() {
+<span class="fc" id="L353">        this.lines = fileReader.readLines(this.map);</span>
+<span class="fc" id="L354">        this.lines_f = fileReader.convertToArray(this.lines);</span>
+<span class="fc" id="L355">        this.mazepath = MazePath.createPath(this.lines_f);</span>
+<span class="fc" id="L356">        this.mb = new MazeBuilder(this.map, this.downLeft, this.downRight, this.horizontal, this.upLeft, this.upRight, this.vertical, this.fruit, this.superFruit, this.soda);</span>
+<span class="fc" id="L357">        return true;</span>
+    }
+
+    /**
+     * Reads the config.json file and assigns the appropriate attributes
+     * @param filename the config filename to be read
+     * @return whether reading from the config.json file was successful
+     */
+    public boolean readConfigFile(String filename) {
+        try{
+<span class="fc" id="L367">            Object obj = new JSONParser().parse(new FileReader(filename));</span>
+<span class="fc" id="L368">            JSONObject jo = (JSONObject) obj; </span>
+          
+<span class="fc" id="L370">            this.map = (String) jo.get(&quot;map&quot;); </span>
+
+<span class="fc" id="L372">            long life_tmp = (long) jo.get(&quot;lives&quot;); </span>
+<span class="fc" id="L373">            this.lives = (int) life_tmp;</span>
+<span class="fc" id="L374">            long speed_tmp = (long) jo.get(&quot;speed&quot;); </span>
+<span class="fc" id="L375">            this.speed = (int) speed_tmp;</span>
+<span class="fc" id="L376">            long frightened_temp = (long) jo.get(&quot;frightenedLength&quot;); </span>
+<span class="fc" id="L377">            this.frightenedLength = (int) frightened_temp;</span>
+<span class="fc" id="L378">            long soda_temp = (long) jo.get(&quot;sodaLength&quot;); </span>
+<span class="fc" id="L379">            this.sodaLength = (int) soda_temp;</span>
+<span class="fc" id="L380">            System.out.println(this.sodaLength);</span>
+            //System.out.println(speed);
+<span class="fc" id="L382">            this.modeLengths1 = (JSONArray) jo.get(&quot;modeLengths&quot;);</span>
+<span class="fc" id="L383">            ArrayList&lt;Integer&gt; modeLengths_i = new ArrayList&lt;Integer&gt;();</span>
+
+<span class="fc bfc" id="L385" title="All 2 branches covered.">            for (int i = 0; i &lt; modeLengths1.size(); i ++) {</span>
+                //System.out.println(modeLengths1.get(i));
+<span class="fc" id="L387">                long tmp = (long)modeLengths1.get(i);</span>
+<span class="fc" id="L388">                modeLengths_i.add((int) tmp);</span>
+            }
+
+<span class="fc" id="L391">            this.modeLengths_i_f = modeLengths_i;</span>
+
+
+<span class="fc" id="L394">        } catch (FileNotFoundException e) {</span>
+<span class="fc" id="L395">            System.out.println(&quot;Nope&quot;);</span>
+<span class="fc" id="L396">            return false;</span>
+<span class="nc" id="L397">        } catch (IOException i) {</span>
+<span class="nc" id="L398">            System.out.println(&quot;Nope1&quot;);</span>
+<span class="nc" id="L399">            return false;</span>
+<span class="fc" id="L400">        } catch (ParseException p) {</span>
+<span class="fc" id="L401">            System.out.println(&quot;Nope2&quot;);</span>
+<span class="fc" id="L402">            return false;</span>
+<span class="fc" id="L403">        }</span>
+        
+<span class="fc" id="L405">        return true;</span>
+    }
+
+    /**
+     * Gets the fruit list for the game
+     * @return the fruit list
+     */
+    public ArrayList&lt;Fruit&gt; getFruitList() {
+<span class="fc" id="L413">        return this.fruitList;</span>
+    }
+    /**
+     * Gets the superFruit list for the game
+     * @return the superFruit list
+     */
+    public ArrayList&lt;superFruit&gt; getSuperFruitList() {
+<span class="fc" id="L420">        return this.superFruitList;</span>
+    }
+    /**
+     * Gets the soda list for the game
+     * @return the soda list
+     */
+    public ArrayList&lt;soda&gt; getSodaList() {
+<span class="fc" id="L427">        return this.sodaList;</span>
+    }
+
+    /**
+     * Gets the player object
+     * @return the player object
+     */
+    public Player getPlayer() {
+<span class="fc" id="L435">        return this.player;</span>
+    }
+
+    /**
+     * Gets the 2D array of cells for the map
+     * @return the 2D array of cells for the map
+     */
+    public String[][] getLines_f() {
+<span class="fc" id="L443">        return this.lines_f;</span>
+    }
+
+    /**
+     * Gets the map filename 
+     * @return the map filename
+     */
+    public String getMap() {
+<span class="fc" id="L451">        return this.map;</span>
+    }
+
+    /**
+     * Gets the total amount of lives the waka has
+     * @return the total amount of lives for the waka
+     */
+    public int getLives() {
+<span class="fc" id="L459">        return this.lives;</span>
+    }
+
+    /**
+     * Gets the speed in which the waka travels
+     * @return the speed of the waka
+     */
+    public int getSpeed() {
+<span class="fc" id="L467">        return this.speed;</span>
+    }
+
+    /**
+     * Gets the length of the soda effect
+     * @return the length of the soda effect
+     */
+    public int getSodaLength() {
+<span class="fc" id="L475">        return this.sodaLength;</span>
+    }
+
+    /**
+     * Gets the length of the frightened effect
+     * @return the length of the frightened effect
+     */
+    public int getFrightenedLength() {
+<span class="fc" id="L483">        return this.frightenedLength;</span>
+    }
+
+    /**
+     * Gets the array list of the scatter and chase mode lengths
+     * @return the array list of the scatter and chase mode lengths
+     */
+    public ArrayList&lt;Integer&gt; getModeLengths() {
+<span class="fc" id="L491">        return this.modeLengths_i_f;</span>
+    }
+
+    /**
+     * Gets an array list of all the ghost objects in the game
+     * @return an array list of all the ghost objects in the game
+     */
+    public ArrayList&lt;GhostObject&gt; getGhostObj() {
+<span class="fc" id="L499">        return this.ghost_obj;</span>
+    }
+
+    /**
+     * Displays the win screen if all fruit and superFruit have been eaten
+     * @return whether the win screen has been successfully displayed
+     */
+    public boolean winScreen() {
+<span class="nc" id="L507">        app.background(0,0,0);</span>
+
+<span class="nc" id="L509">        app.textFont(this.font);</span>
+<span class="nc" id="L510">            app.text(&quot;You Win&quot;, 168, 204);</span>
+            //this.textFont(&quot;You Win&quot;, 168, 204);
+<span class="nc" id="L512">            resetAll();</span>
+        
+<span class="nc" id="L514">        return true;</span>
+    }
+
+    /**
+     * Displays the lose screen if the player has run out of lives
+     * @return whether the lose screen has been successfully displayed
+     */
+    public boolean loseScreen() {
+<span class="nc" id="L522">        app.background(0,0,0);</span>
+
+<span class="nc" id="L524">        app.image(this.gameover, 168, 204);</span>
+<span class="nc" id="L525">        resetAll();</span>
+
+<span class="nc" id="L527">        return true;</span>
+    }
+
+    /**
+     * Performs resets on all the objects in the game
+     * @return whether the reset was successful
+     */
+    public boolean resetAll() {
+<span class="fc bfc" id="L535" title="All 2 branches covered.">        if (deathTimer == 600) {</span>
+<span class="fc" id="L536">            this.player.setLives(this.lives);</span>
+<span class="fc" id="L537">            this.deathTimer =0;</span>
+<span class="fc" id="L538">            mb.fruitList();</span>
+<span class="fc" id="L539">            mb.superFruitList();</span>
+<span class="fc" id="L540">            mb.sodaList();</span>
+
+<span class="fc" id="L542">            this.player.updateFruitList(mb.fruitList());</span>
+<span class="fc" id="L543">            this.player.updateSuperFruitList(mb.superFruitList());</span>
+<span class="fc" id="L544">            this.player.updateSodaList(mb.sodaList());</span>
+
+<span class="fc" id="L546">            this.player.setX(this.player.beg_x);</span>
+<span class="fc" id="L547">            this.player.setY(this.player.beg_y);</span>
+<span class="fc bfc" id="L548" title="All 2 branches covered.">            for (GhostObject g : ghost_obj) {</span>
+<span class="fc" id="L549">                g.setScatterExact(true);</span>
+<span class="fc" id="L550">                g.resetFrames();</span>
+<span class="fc" id="L551">                g.resetScatterIndex();</span>
+<span class="fc" id="L552">                g.setAllDead();</span>
+<span class="fc" id="L553">                g.setFrightened(false);</span>
+<span class="fc" id="L554">                g.sodaEffectSet(false);</span>
+<span class="fc" id="L555">                g.resetSodaFrames();</span>
+
+<span class="fc" id="L557">            }</span>
+<span class="fc bfc" id="L558" title="All 2 branches covered.">            for (GhostObject g : ghost_obj) {</span>
+<span class="fc" id="L559">                g.setDead(false);</span>
+<span class="fc" id="L560">            }</span>
+<span class="fc" id="L561">            return true;</span>
+
+        } else {
+<span class="fc" id="L564">            this.deathTimer ++;</span>
+<span class="fc" id="L565">            return false;</span>
+        }
+    }
+
+    /**
+     * Performs the logic in determining whether the waka's mouth is open or closed
+     * @return whether the waka's mouth is open or closed
+     */
+    public boolean openMouthLogic() {
+<span class="fc bfc" id="L574" title="All 2 branches covered.">        if (n % 8 == 0) {</span>
+<span class="fc bfc" id="L575" title="All 2 branches covered.">            this.openMouth = !this.openMouth;</span>
+<span class="fc" id="L576">            this.player.openMouth(this.openMouth);</span>
+        }
+<span class="fc" id="L578">        return this.openMouth;</span>
+    }
+
+    /**
+     * Displays the game running, drawing objects to the screen at the correct location
+     * @return whether the game running screen is displayed successfully
+     */
+    public boolean gameRun() {
+<span class="fc" id="L586">        this.mb.draw(app);</span>
+<span class="fc" id="L587">        openMouthLogic();</span>
+<span class="fc" id="L588">        this.player.tick(this.direction);</span>
+<span class="fc" id="L589">        this.player.draw(app);</span>
+<span class="fc bfc" id="L590" title="All 2 branches covered.">        for (GhostObject g : ghost_obj) {</span>
+<span class="fc" id="L591">            g.tick('a');</span>
+<span class="fc" id="L592">            g.draw(app);</span>
+
+<span class="fc" id="L594">        }</span>
+<span class="fc" id="L595">        return true;</span>
+    }
+
+    /**
+     * Sets the total elasped frames to a certain integer
+     * @param n the new elapsed frames
+     * @return the new elapsed frames
+     */
+    public int setN(int n) {
+<span class="fc" id="L604">        this.n = n;</span>
+<span class="fc" id="L605">        return n;</span>
+    }
+
+    /**
+     * Gets the death time that has elapsed
+     * @return the death time that has elapsed
+     */
+    public int getDeathTimer() {
+<span class="fc" id="L613">        return this.deathTimer;</span>
+    }
+
+    /**
+     * Draws to the screen the appropriate sprites and backgrounds
+     */
+    public void drawCall() {
+<span class="fc" id="L620">        this.n = app.frameCount;</span>
+
+<span class="pc bpc" id="L622" title="3 of 6 branches missed.">        if (mb.checkFruitListDone() == true &amp; mb.checkSuperFruitListDone() == true){</span>
+<span class="nc" id="L623">            winScreen();</span>
+        }
+<span class="pc bpc" id="L625" title="1 of 2 branches missed.">        else if (this.player.getLives() &gt; 0){</span>
+<span class="fc" id="L626">            gameRun();</span>
+        } else {
+<span class="nc" id="L628">            loseScreen();</span>
+        }
+<span class="fc" id="L630">    }</span>
+
+    /**
+     * Determines which key the player has pressed
+     * @param key the key which the player has pressed
+     */
+
+    public void keyPressedCall(int code) {
+<span class="fc bfc" id="L638" title="All 2 branches covered.">        if (code == 38) {</span>
+<span class="fc" id="L639">            this.player.setDirection('w');</span>
+        }
+<span class="fc bfc" id="L641" title="All 2 branches covered.">        if (code == 40) {</span>
+<span class="fc" id="L642">            this.player.setDirection('s');</span>
+        }
+<span class="fc bfc" id="L644" title="All 2 branches covered.">        if (code == 37) {</span>
+<span class="fc" id="L645">            this.player.setDirection('a');</span>
+        }
+<span class="fc bfc" id="L647" title="All 2 branches covered.">        if (code == 39) {</span>
+<span class="fc" id="L648">            this.player.setDirection('d');</span>
+        }
+<span class="fc bfc" id="L650" title="All 2 branches covered.">        if (code == 32) {</span>
+<span class="fc bfc" id="L651" title="All 2 branches covered.">            for (GhostObject g : ghost_obj) {</span>
+<span class="fc" id="L652">                g.setDebug();</span>
+<span class="fc" id="L653">            }</span>
+        }
+<span class="fc" id="L655">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

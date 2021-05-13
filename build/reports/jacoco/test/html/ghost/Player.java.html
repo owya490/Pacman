@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Player.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Milestone</a> &gt; <a href="index.source.html" class="el_package">ghost</a> &gt; <span class="el_source">Player.java</span></div><h1>Player.java</h1><pre class="source lang-java linenums">package ghost;
+import processing.core.PApplet;
+import processing.core.PImage;
+import java.util.*;
+import java.io.*;
+public class Player extends MovingEntities{
+     /** 
+     * The beginning X coordinates
+     */
+    public int beg_x;
+    /** 
+     * The beginning Y coordinates
+     */
+    public int beg_y;
+    /**
+     * The horizontal velocity of the Waka
+     */
+<span class="fc" id="L18">    private int xvel = 0;</span>
+    /**
+     * The vertical velocity of the Waka
+     */
+<span class="fc" id="L22">    private int yvel = 0;</span>
+    /**
+     * The amount of lives the waka has left
+     */
+    private int lives;
+    /**
+     * The speed the waka moves at
+     */
+    private int speed;
+
+    /**
+     * The sprite for waka when mouth is closed
+     */
+    private PImage playerClosed;
+    /** 
+     * The sprite for waka when mouth is open and facing down
+     */
+    private PImage playerDown;
+    /** 
+     * The sprite for waka when mouth is open and facing left
+     */
+    private PImage playerLeft;
+    /** 
+     * The sprite for waka when mouth is open and facing right
+     */
+    private PImage playerRight;
+    /** 
+     * The sprite for waka when mouth is open and facing up
+     */
+    private PImage playerUp;
+
+    /**
+     * Marks if wakas mouth currently should be open or not
+     */
+    private boolean openMouth;
+
+    /**
+     * The input direction the player wants the waka to travel
+     */
+<span class="fc" id="L61">    private char input = 'd';</span>
+
+    /**
+     * The mazepath available for Entities to traverse
+     * True is traversable
+     * False is not traversable
+     */
+    private boolean[][] path;
+
+    /**
+     * The direction the waka is currently travelling in 
+     */
+    private char direction;
+
+    /**
+     * The map of cells read from the map text file
+     */
+    private String[][] map;
+
+    /**
+     * List of all fruit objects and locations in the map
+     */
+    private ArrayList&lt;Fruit&gt; fruitList;
+
+    /**
+     * List of all superFruit objects and locations in the map
+     */
+    private ArrayList&lt;superFruit&gt; superFruitList;
+
+    /**
+     * List of all soda objects and locations in the map
+     */
+    private ArrayList&lt;soda&gt; sodaList;
+
+    /**
+     * List of all ghost objects currently in the game
+     */
+    private ArrayList&lt;GhostObject&gt; ghost_obj;
+
+     /**
+     * Constructor for Player, constructs a moveable waka
+     * The constructor constructs a waka which is what the player controls to navigate the maze to consumer all the fruit and superFruits
+     * @param sodaList a list of soda objects in the map
+     * @param superFruitList a list of superFruit objects in the map
+     * @param fruitList a list of fruit objects in the map
+     * @param map a 2D array of all cell objects read from the map text file
+     * @param path the mazepath available for Entities to traverse
+     * @param lives the amount of lives the waka has in total
+     * @param speed the speed the waka navigates the maze
+     * @param filename the filename of the map text file used to find the start location of the waka
+     * @param playerClosed the sprite for the waka when the mouth is closed
+     * @param playerDown the sprite for the waka when mouth is open and facing down
+     * @param playerLeft the sprite for the waka when mouth is open and facing left
+     * @param playerRight the sprite for the waka when mouth is open and facing right
+     * @param playerUp the sprite for the waka when mouth is open and facing up
+     */
+<span class="fc" id="L117">    public Player(ArrayList&lt;soda&gt; sodaList, ArrayList&lt;superFruit&gt; superFruitList, ArrayList&lt;Fruit&gt; fruitList, String[][] map, boolean[][] path, int lives, int speed, String filename, PImage playerClosed, PImage playerDown, PImage playerLeft, PImage playerRight, PImage playerUp) {</span>
+<span class="fc" id="L118">        this.sodaList = sodaList;</span>
+
+<span class="fc" id="L120">        this.superFruitList = superFruitList;</span>
+<span class="fc" id="L121">        this.beg_x = (findPlayerStart.findx(filename))*16 -4;</span>
+<span class="fc" id="L122">        this.beg_y = ((findPlayerStart.findy(filename))*16) -5;</span>
+<span class="fc" id="L123">        this.x = (findPlayerStart.findx(filename))*16 -4;</span>
+<span class="fc" id="L124">        this.y = ((findPlayerStart.findy(filename))*16) -5;</span>
+<span class="fc" id="L125">        this.playerClosed = playerClosed;</span>
+<span class="fc" id="L126">        this.playerDown = playerDown;</span>
+<span class="fc" id="L127">        this.playerLeft = playerLeft;</span>
+<span class="fc" id="L128">        this.playerRight = playerRight;</span>
+<span class="fc" id="L129">        this.playerUp = playerUp;</span>
+<span class="fc" id="L130">        this.lives = lives;</span>
+<span class="fc" id="L131">        this.speed = speed;</span>
+<span class="fc" id="L132">        this.path = path;</span>
+<span class="fc" id="L133">        this.map = map;</span>
+<span class="fc" id="L134">        this.fruitList = fruitList;</span>
+<span class="fc" id="L135">    }</span>
+
+    /**
+     * The method for conducting the logic of the waka
+     * This handles movement inputs from the player and ensures that the waka performs the right movement according to player input and traversable path
+     * Also checks if the waka is currently eating a collectible, including fruit, superFruit and Soda and changes the attribute of the collectible to eaten
+     * @param input the input from the player for the movement of the waka
+     */
+    public void tick(char input) {
+<span class="fc bfc" id="L144" title="All 2 branches covered.">        if (this.dead == true) {</span>
+<span class="fc" id="L145">            this.lives --;</span>
+<span class="fc" id="L146">            this.x = this.beg_x;</span>
+<span class="fc" id="L147">            this.y = this.beg_y;</span>
+<span class="fc" id="L148">            this.direction = 'd';</span>
+<span class="fc" id="L149">            this.dead = false;</span>
+        }
+
+
+<span class="fc bfc" id="L153" title="All 2 branches covered.">        if (this.direction == 'w') {</span>
+<span class="fc bfc" id="L154" title="All 2 branches covered.">            if (path[this.y-1][this.x]){</span>
+<span class="fc" id="L155">                this.input = 'w';</span>
+            }
+        }
+<span class="fc bfc" id="L158" title="All 2 branches covered.">        if (this.direction == 's') {</span>
+<span class="fc bfc" id="L159" title="All 2 branches covered.">            if (path[this.y+1][this.x]){</span>
+<span class="fc" id="L160">                this.input = 's';</span>
+            }
+        }
+<span class="fc bfc" id="L163" title="All 2 branches covered.">        if (this.direction == 'a') {</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">            if (path[this.y][this.x-1]){</span>
+<span class="fc" id="L165">                this.input = 'a';</span>
+            }
+        }
+<span class="fc bfc" id="L168" title="All 2 branches covered.">        if (this.direction == 'd') {</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">            if (path[this.y][this.x+1]){</span>
+<span class="fc" id="L170">                this.input = 'd';</span>
+            }
+        }
+
+<span class="fc bfc" id="L174" title="All 2 branches covered.">        if (this.input == 'w') {</span>
+<span class="fc" id="L175">            this.yvel = -speed;</span>
+<span class="fc" id="L176">            this.xvel =0;</span>
+        }
+<span class="fc bfc" id="L178" title="All 2 branches covered.">        if (this.input == 'a') {</span>
+<span class="fc" id="L179">            this.xvel = -speed;</span>
+<span class="fc" id="L180">            this.yvel =0;</span>
+
+        }
+<span class="fc bfc" id="L183" title="All 2 branches covered.">        if (this.input == 's') {</span>
+<span class="fc" id="L184">            this.yvel = speed;</span>
+<span class="fc" id="L185">            this.xvel =0;</span>
+        }
+<span class="fc bfc" id="L187" title="All 2 branches covered.">        if (this.input == 'd') {</span>
+<span class="fc" id="L188">            this.xvel = speed;</span>
+<span class="fc" id="L189">            this.yvel =0;</span>
+        }
+
+<span class="fc bfc" id="L192" title="All 2 branches covered.">        if (path[this.y + this.yvel][this.x + this.xvel] == true) {</span>
+<span class="fc" id="L193">            this.x += this.xvel;</span>
+<span class="fc" id="L194">            this.y += this.yvel;</span>
+<span class="fc bfc" id="L195" title="All 2 branches covered.">            for (Fruit f : this.fruitList) {</span>
+<span class="fc bfc" id="L196" title="All 6 branches covered.">                if (this.x  == f.getX() &amp; this.y == f.getY()) {</span>
+<span class="fc" id="L197">                    f.eaten = true;</span>
+                } 
+<span class="fc" id="L199">            }</span>
+<span class="fc bfc" id="L200" title="All 2 branches covered.">            for (superFruit f : this.superFruitList) {</span>
+<span class="fc bfc" id="L201" title="All 8 branches covered.">                if (this.x  == f.getX() &amp; this.y == f.getY() &amp; f.eaten == false) {</span>
+<span class="fc" id="L202">                    f.eaten = true;</span>
+<span class="fc bfc" id="L203" title="All 2 branches covered.">                    for (GhostObject g : this.ghost_obj) {</span>
+<span class="fc bfc" id="L204" title="All 2 branches covered.">                        if (g.getFrightened() == false) {</span>
+<span class="fc" id="L205">                            g.setFrightened(true);</span>
+                        } else {
+<span class="fc" id="L207">                            g.resetFrightenedFrames();</span>
+                        }
+<span class="fc" id="L209">                    }</span>
+                } 
+<span class="fc" id="L211">            }</span>
+<span class="fc bfc" id="L212" title="All 2 branches covered.">            for (soda s : this.sodaList) {</span>
+<span class="fc bfc" id="L213" title="All 8 branches covered.">                if (this.x  == s.getX() &amp; this.y == s.getY() &amp; s.eaten == false) {</span>
+<span class="fc" id="L214">                    s.eaten = true;</span>
+<span class="fc bfc" id="L215" title="All 2 branches covered.">                    for (GhostObject g : this.ghost_obj) {</span>
+<span class="fc bfc" id="L216" title="All 2 branches covered.">                        if (g.sodaEffectGet() == false) {</span>
+<span class="fc" id="L217">                            g.sodaEffectSet(true);</span>
+                        } else {
+<span class="fc" id="L219">                            g.resetSodaFrames();</span>
+                        }
+<span class="fc" id="L221">                    }</span>
+                } 
+<span class="fc" id="L223">            }</span>
+        } else {
+<span class="fc" id="L225">            this.xvel = 0;</span>
+<span class="fc" id="L226">            this.yvel = 0;</span>
+        }
+<span class="fc" id="L228">    }</span>
+
+    /**
+     * The draw function for the Player class
+     * It draws to the screen the updated positions of the waka and its current mouth state
+     * Also determines whether which mouth state the waka is currenlty in and draws it accordingly
+     * @param app the PApplet App that it will draw to
+     */
+    public void draw(PApplet app) {
+<span class="fc bfc" id="L237" title="All 2 branches covered.">        for (int i = 0; i &lt; lives; i ++) {</span>
+<span class="fc" id="L238">            app.image(this.playerRight, 8 + (28*i), 544);</span>
+        }
+<span class="pc bpc" id="L240" title="1 of 4 branches missed.">        if (this.openMouth &amp;&amp; this.input =='w') {</span>
+<span class="nc" id="L241">            app.image(this.playerUp, x , y);</span>
+        } 
+<span class="pc bpc" id="L243" title="1 of 4 branches missed.">        else if (this.openMouth &amp;&amp; this.input =='a') {</span>
+<span class="nc" id="L244">            app.image(this.playerLeft, x , y);</span>
+        } 
+<span class="pc bpc" id="L246" title="1 of 4 branches missed.">        else if (this.openMouth &amp;&amp; this.input =='s') {</span>
+<span class="nc" id="L247">            app.image(this.playerDown, x , y);</span>
+        } 
+<span class="pc bpc" id="L249" title="1 of 4 branches missed.">        else if (this.openMouth &amp;&amp; this.input =='d') {</span>
+<span class="fc" id="L250">            app.image(this.playerRight, x , y);</span>
+        }        
+        else {
+<span class="fc" id="L253">            app.image(this.playerClosed, x , y);</span>
+        }
+<span class="fc" id="L255">    }</span>
+
+    /**
+     * Sets the boolean of openMouth to the correct current state
+     * @param open a boolean of whether the mouth is currently open or not
+     * @return returns whether the method set the waka's mouth to open or closed, true or false
+     */
+    public boolean openMouth(boolean open){
+<span class="fc" id="L263">        this.openMouth = open;</span>
+<span class="fc" id="L264">        return open;</span>
+    }
+
+    /**
+     * Sets the X coordintate of the waka
+     * @param x takes in a x value to set the X coordinate of the waka to
+     * @return outputs the value of the new X coordinate of the waka
+     */
+    public int setX(int x) {
+<span class="fc" id="L273">        this.x = x;</span>
+<span class="fc" id="L274">        return this.x;</span>
+    }
+
+    /**
+     * Sets the Y coordintate of the waka
+     * @param y takes in a x value to set the Y coordinate of the waka to
+     * @return outputs the value of the new Y coordinate of the waka
+     */
+    public int setY(int y) {
+<span class="fc" id="L283">        this.y = y;</span>
+<span class="fc" id="L284">        return this.y;</span>
+    }
+
+    /**
+     * Sets the new Direction the waka is travelling
+     * This is inputed as a character, 'w', 'a', 's', 'd'
+     * @param c the new direction the waka is travelling
+     * @return returns the new direction the waka is travelling 'w', 'a', 's', 'd'
+     */
+    public char setDirection(char c) {
+<span class="fc" id="L294">        this.direction = c;</span>
+<span class="fc" id="L295">        return this.direction;</span>
+    }
+
+    /**
+     * Gets the Direction the waka is currently travelling in
+     * @return returns the direction the waka is currently travelling in 
+     */
+    public char getDirection() {
+<span class="fc" id="L303">        return this.direction;</span>
+    }
+
+    /**
+     * Sets the list of GhostObjects in the game
+     * @param o the new list of GhostObjects to be set in the player class
+     * @return returns if the list of new GhostObjects is correctly set
+     */
+    public boolean setGhostObj(ArrayList&lt;GhostObject&gt; o){
+<span class="fc" id="L312">        this.ghost_obj = o;</span>
+<span class="fc" id="L313">        return true;</span>
+    }
+
+    /**
+     * Gets the amount of lives the waka has remaining
+     * @return the amount of lives the waka has remaining
+     */
+    public int getLives() {
+<span class="fc" id="L321">        return this.lives;</span>
+    }
+
+    /**
+     * Sets the amount of lives the waka has remaining to a new amount
+     * @param l the new amount lives the waka will have remaining
+     * @return if the new amount of lives has been correctly set
+     */
+    public boolean setLives(int l) {
+<span class="fc" id="L330">        this.lives = l;</span>
+<span class="fc" id="L331">        return true;</span>
+    }
+
+    /**
+     * Updates the fruitList to a new list of fruit objects
+     * @param f the new list of fruit objects
+     * @return if the list was correctly set
+     */
+    public boolean updateFruitList(ArrayList&lt;Fruit&gt; f) {
+<span class="fc" id="L340">        this.fruitList = f;</span>
+<span class="fc" id="L341">        return true;</span>
+    }
+
+    /**
+     * Updates the superFruitList to a new list of superFruit objects
+     * @param f the new list of superFruit objects
+     * @return if the list was correctly set
+     */
+    public boolean updateSuperFruitList(ArrayList&lt;superFruit&gt; f) {
+<span class="fc" id="L350">        this.superFruitList = f;</span>
+<span class="fc" id="L351">        return true;</span>
+    }
+
+    /**
+     * Updates the sodaList to a new list of soda objects
+     * @param s the new list of soda objects
+     * @return if the list was correctly set
+     */
+    public boolean updateSodaList(ArrayList&lt;soda&gt; s) {
+<span class="fc" id="L360">        this.sodaList = s;</span>
+<span class="fc" id="L361">        return true;</span>
+    }
+    
+    /**
+     * Gets if the waka is dead
+     * @return if the waka is dead or not
+     */
+    public boolean getDead() {
+<span class="fc" id="L369">        return this.dead;</span>
+    }
+
+    /**
+     * Gets the input the player inputs
+     * @return the input the player inputed
+     */
+    public char getInput() {
+<span class="fc" id="L377">        return this.input;</span>
+    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

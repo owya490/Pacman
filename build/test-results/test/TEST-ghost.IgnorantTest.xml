@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="ghost.IgnorantTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2020-11-16T11:40:33" hostname="OWYA-PC" time="0.156">
+  <properties/>
+  <testcase name="constructorTest()" classname="ghost.IgnorantTest" time="0.002"/>
+  <testcase name="upOrDownCornerTest()" classname="ghost.IgnorantTest" time="0.003"/>
+  <testcase name="upOrDownTest()" classname="ghost.IgnorantTest" time="0.031"/>
+  <testcase name="tickTest()" classname="ghost.IgnorantTest" time="0.119"/>
+  <system-out><![CDATA[red
+red
+red
+red
+red
+red
+red
+red
+false
+false
+false
+false
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

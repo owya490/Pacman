@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Ignorant.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Milestone</a> &gt; <a href="index.source.html" class="el_package">ghost</a> &gt; <span class="el_source">Ignorant.java</span></div><h1>Ignorant.java</h1><pre class="source lang-java linenums">package ghost;
+import processing.core.PApplet;
+import processing.core.PImage;
+import java.util.*;
+import java.io.*;
+import org.json.simple.JSONArray; 
+import org.json.simple.JSONObject; 
+import java.lang.*;
+
+public class Ignorant extends GhostObject {
+
+    /**
+     * The sprite for the Ghost
+     */
+    private PImage ghost;
+    /**
+     * Marks the amount of possible paths the Ghost can take at a given moment
+     */
+<span class="fc" id="L19">    private int check = 0;</span>
+    /**
+     * The corner destination for the Ghost
+     */
+<span class="fc" id="L23">    private int[] corner_a = new int[2];</span>
+    /**
+     * The target destination for the Ghost
+     */
+<span class="fc" id="L27">    private int[] target = new int[2];</span>
+    
+    
+    /**
+     * The constructor for the Ambusher Ghost
+     * @param sodaGhost The sprite for the soda affected Ghosts
+     * @param x The X coordinates of Ghost
+     * @param y The Y coordinates of Ghost
+     * @param ghost The sprite for the Ghost
+     * @param ghost_scared The sprite for frightened Ghost
+     * @param modeLengths1 The mode Length array for the Ghost Scatter mode
+     * @param speed The speed of the Ghost
+     * @param path The traversable path 
+     * @param player_g The player object in the game
+     * @param other_ghosts The other ghost objects in the game
+     * @param frightenedLength The length of being frightened for the Ghost
+     * @param sodaLength The length of being affected by soda for the Ghost
+     */
+<span class="fc" id="L45">    public Ignorant(PImage sodaGhost, int x, int y, PImage ghost, PImage ghost_scared, ArrayList&lt;Integer&gt; modeLengths1, int speed, boolean[][] path, Player player_g, ArrayList&lt;GhostObject&gt; other_ghosts, int frightenedLength, int sodaLength){</span>
+<span class="fc" id="L46">        this.sodaGhost = sodaGhost;</span>
+<span class="fc" id="L47">        this.sodaLength = sodaLength;</span>
+
+<span class="fc" id="L49">        this.other_ghosts = other_ghosts;</span>
+<span class="fc" id="L50">        this.frightenedLength = frightenedLength;</span>
+
+<span class="fc" id="L52">        this.ghost_scared = ghost_scared;</span>
+<span class="fc" id="L53">        this.ghost = ghost;</span>
+<span class="fc" id="L54">        this.modeLengths1 = modeLengths1;</span>
+<span class="fc" id="L55">        this.x_beg = x*16-4;</span>
+<span class="fc" id="L56">        this.y_beg = y*16-5;</span>
+<span class="fc" id="L57">        this.x = x*16-4;</span>
+<span class="fc" id="L58">        this.y = y*16-5;</span>
+<span class="fc" id="L59">        this.speed = speed;</span>
+<span class="fc" id="L60">        this.path = path;</span>
+<span class="fc" id="L61">        this.player_g = player_g;</span>
+<span class="fc" id="L62">        this.player_x = player_g.getX();</span>
+<span class="fc" id="L63">        this.player_y = player_g.getY();</span>
+<span class="fc" id="L64">        this.modeLengths_f = new int[modeLengths1.size()];</span>
+<span class="fc" id="L65">        int accumul = 0;</span>
+<span class="fc" id="L66">        int index =0;</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        for (int i : modeLengths1) {</span>
+<span class="fc" id="L68">            accumul += i*60;</span>
+<span class="fc" id="L69">            modeLengths_f[index] = accumul;</span>
+<span class="fc" id="L70">            index ++;</span>
+<span class="fc" id="L71">        }</span>
+<span class="fc" id="L72">    }</span>
+
+    /**
+     * Handles the Logic of the Ghost Object
+     */
+    public void tick(char input) {
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        if (this.isFrightened == true) {</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">            if (this.frightenedFrames == frightenedLength*60) {</span>
+<span class="fc" id="L80">                this.isFrightened = false;</span>
+<span class="fc" id="L81">                this.frightenedFrames = 0;</span>
+
+            } else{
+<span class="fc" id="L84">                this.frightenedFrames ++;</span>
+            }
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        } else if (this.sodaEffect == true) {</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">            if (this.sodaFrames == this.sodaLength*60) { //implement soda length</span>
+<span class="fc" id="L88">                this.sodaEffect = false;</span>
+<span class="fc" id="L89">                this.sodaFrames = 0;</span>
+
+            } else{
+<span class="fc" id="L92">                this.sodaFrames ++;</span>
+            }
+        }
+        else {
+<span class="fc" id="L96">            this.frames ++;</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">            if (this.index_scatter == modeLengths_f.length) {</span>
+<span class="fc" id="L98">                this.index_scatter =0;</span>
+            }
+<span class="fc bfc" id="L100" title="All 2 branches covered.">            if (this.frames == (modeLengths_f[this.index_scatter])) {</span>
+<span class="fc" id="L101">                setScatter();</span>
+<span class="fc" id="L102">                this.index_scatter ++;</span>
+<span class="fc" id="L103">                System.out.println(this.scatter);</span>
+            }
+            // if (this.index_scatter == modeLengths_f.length -1) {
+            //     this.index_scatter =0;
+            // }
+        }
+
+
+<span class="fc" id="L111">        this.player_x = player_g.getX();</span>
+<span class="fc" id="L112">        this.player_y = player_g.getY();</span>
+
+<span class="fc bfc" id="L114" title="All 6 branches covered.">        if (this.player_x == this.x &amp; this.player_y == this.y) {</span>
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">            if (this.isFrightened == true) {</span>
+<span class="fc" id="L116">                this.isDead = true;</span>
+<span class="fc" id="L117">                this.x = this.x_beg;</span>
+<span class="fc" id="L118">                this.y = this.y_beg;</span>
+            }
+<span class="nc bnc" id="L120" title="All 6 branches missed.">            else if(this.isFrightened == false &amp; this.isDead == false) {</span>
+<span class="nc" id="L121">                player_g.setDead(true);</span>
+<span class="nc" id="L122">                this.x = this.x_beg;</span>
+<span class="nc" id="L123">                this.y = this.y_beg;</span>
+<span class="nc" id="L124">                this.setAllDead();</span>
+            }
+        }
+<span class="fc bfc" id="L127" title="All 6 branches covered.">        else if (Math.abs(this.player_x - this.x) &lt;= 16 &amp; this.player_y == this.y) {</span>
+<span class="fc bfc" id="L128" title="All 2 branches covered.">            if (this.isFrightened == true) {</span>
+<span class="fc" id="L129">                this.isDead = true;</span>
+<span class="fc" id="L130">                this.x = this.x_beg;</span>
+<span class="fc" id="L131">                this.y = this.y_beg;</span>
+            }
+<span class="pc bpc" id="L133" title="3 of 6 branches missed.">            else if(this.isFrightened == false &amp; this.isDead == false) {</span>
+<span class="fc" id="L134">                player_g.setDead(true);</span>
+<span class="fc" id="L135">                this.x = this.x_beg;</span>
+<span class="fc" id="L136">                this.y = this.y_beg;</span>
+<span class="fc" id="L137">                this.setAllDead();</span>
+            }
+
+        }
+
+<span class="fc bfc" id="L142" title="All 6 branches covered.">        else if (this.player_x == this.x &amp; Math.abs(this.player_y - this.y) &lt;= 16) {</span>
+<span class="fc bfc" id="L143" title="All 2 branches covered.">            if (this.isFrightened == true) {</span>
+<span class="fc" id="L144">                this.isDead = true;</span>
+<span class="fc" id="L145">                this.x = this.x_beg;</span>
+<span class="fc" id="L146">                this.y = this.y_beg;</span>
+            }
+<span class="pc bpc" id="L148" title="3 of 6 branches missed.">            else if(this.isFrightened == false &amp; this.isDead == false) {</span>
+<span class="fc" id="L149">                player_g.setDead(true);</span>
+<span class="fc" id="L150">                this.x = this.x_beg;</span>
+<span class="fc" id="L151">                this.y = this.y_beg;</span>
+<span class="fc" id="L152">                this.setAllDead();</span>
+            }
+
+        }
+        
+
+<span class="fc bfc" id="L158" title="All 2 branches covered.">        if (path[y][x+1] == true) {</span>
+<span class="fc" id="L159">            check ++;</span>
+        }
+<span class="fc bfc" id="L161" title="All 2 branches covered.">        if (path[y][x-1] == true) {</span>
+<span class="fc" id="L162">            check ++;</span>
+        }
+<span class="fc bfc" id="L164" title="All 2 branches covered.">        if (path[y+1][x] == true) {</span>
+<span class="fc" id="L165">            check ++;</span>
+        }
+<span class="fc bfc" id="L167" title="All 2 branches covered.">        if (path[y-1][x] == true) {</span>
+<span class="fc" id="L168">            check ++;</span>
+        }
+<span class="fc bfc" id="L170" title="All 2 branches covered.">        if (check &gt; 2) {</span>
+            char[] tmp;
+<span class="fc bfc" id="L172" title="All 2 branches covered.">            if (this.isFrightened == true) {</span>
+<span class="fc" id="L173">                tmp = upOrDownRandom();</span>
+            }
+<span class="pc bpc" id="L175" title="1 of 2 branches missed.">            else if (this.scatter == true) {</span>
+<span class="nc" id="L176">                tmp = upOrDownCorner();</span>
+
+            } else {
+<span class="fc bfc" id="L179" title="All 2 branches covered.">                if (straightLineDistance() &gt; 8*16) {</span>
+<span class="fc" id="L180">                    tmp = upOrDown();</span>
+                } else {
+<span class="fc" id="L182">                    tmp = upOrDownCorner();</span>
+                }
+            }
+
+<span class="fc bfc" id="L186" title="All 8 branches covered.">            if (path[y][x+1] == true &amp; this.direction != 'a' &amp; tmp[0] == 'd') {</span>
+<span class="fc" id="L187">                this.direction = 'd';</span>
+            }
+<span class="pc bpc" id="L189" title="2 of 8 branches missed.">            else if (path[y][x-1] == true &amp; this.direction != 'd' &amp; tmp[0] == 'a') {</span>
+<span class="nc" id="L190">                this.direction = 'a';</span>
+            }
+<span class="pc bpc" id="L192" title="1 of 8 branches missed.">            else if (path[y+1][x] == true &amp; this.direction != 'w' &amp; tmp[0] == 's') {</span>
+<span class="fc" id="L193">                this.direction = 's';</span>
+            }
+<span class="pc bpc" id="L195" title="1 of 8 branches missed.">            else if (path[y-1][x] == true &amp; this.direction != 's' &amp; tmp[0] == 'w') {</span>
+<span class="fc" id="L196">                this.direction = 'w';</span>
+            }
+<span class="pc bpc" id="L198" title="3 of 8 branches missed.">            else if (path[y][x+1] == true &amp; this.direction != 'a' &amp; tmp[2] == 'd') {</span>
+<span class="nc" id="L199">                this.direction = 'd';</span>
+            }
+<span class="pc bpc" id="L201" title="2 of 8 branches missed.">            else if (path[y][x-1] == true &amp; this.direction != 'd' &amp; tmp[2] == 'a') {</span>
+<span class="nc" id="L202">                this.direction = 'a';</span>
+            }
+<span class="pc bpc" id="L204" title="1 of 8 branches missed.">            else if (path[y+1][x] == true &amp; this.direction != 'w' &amp; tmp[2] == 's') {</span>
+<span class="fc" id="L205">                this.direction = 's';</span>
+            }
+<span class="pc bpc" id="L207" title="4 of 8 branches missed.">            else if (path[y-1][x] == true &amp; this.direction != 's' &amp; tmp[2] == 'w') {</span>
+<span class="nc" id="L208">                this.direction = 'w';</span>
+            }
+
+<span class="fc" id="L211">            check = 0;</span>
+                                    
+<span class="fc" id="L213">        } else {</span>
+
+<span class="fc bfc" id="L215" title="All 6 branches covered.">            if (path[y][x+1] == true &amp; this.direction != 'a') {</span>
+<span class="fc" id="L216">                this.direction = 'd';</span>
+            }
+<span class="fc bfc" id="L218" title="All 6 branches covered.">            else if (path[y][x-1] == true &amp; this.direction != 'd') {</span>
+<span class="fc" id="L219">                this.direction = 'a';</span>
+            }
+<span class="fc bfc" id="L221" title="All 6 branches covered.">            else if (path[y+1][x] == true &amp; this.direction != 'w') {</span>
+<span class="fc" id="L222">                this.direction = 's';</span>
+            }
+            else 
+<span class="pc bpc" id="L225" title="1 of 6 branches missed.">            if (path[y-1][x] == true &amp; this.direction != 's') {</span>
+<span class="fc" id="L226">                this.direction = 'w';</span>
+            }
+            else {
+<span class="pc bpc" id="L229" title="1 of 2 branches missed.">                if (path[y][x+1] == true) {</span>
+<span class="nc" id="L230">                    this.direction = 'd';</span>
+<span class="pc bpc" id="L231" title="1 of 2 branches missed.">                } else if (path[y][x-1] == true) {</span>
+<span class="fc" id="L232">                    this.direction = 'a';</span>
+<span class="nc bnc" id="L233" title="All 2 branches missed.">                } else if (path[y+1][x] == true) {</span>
+<span class="nc" id="L234">                    this.direction = 's';</span>
+<span class="nc bnc" id="L235" title="All 2 branches missed.">                } else if (path[y-1][x] == true) {</span>
+<span class="nc" id="L236">                    this.direction = 'w';</span>
+                }
+            }
+<span class="fc" id="L239">            check = 0;</span>
+
+        }
+
+<span class="fc bfc" id="L243" title="All 2 branches covered.">        if (this.direction == 'w') {</span>
+<span class="fc" id="L244">            this.yvel = -speed;</span>
+<span class="fc" id="L245">            this.xvel =0;</span>
+        }
+<span class="fc bfc" id="L247" title="All 2 branches covered.">        if (this.direction == 'a') {</span>
+<span class="fc" id="L248">            this.xvel = -speed;</span>
+<span class="fc" id="L249">            this.yvel =0;</span>
+
+        }
+<span class="fc bfc" id="L252" title="All 2 branches covered.">        if (this.direction == 's') {</span>
+<span class="fc" id="L253">            this.yvel = speed;</span>
+<span class="fc" id="L254">            this.xvel =0;</span>
+        }
+<span class="fc bfc" id="L256" title="All 2 branches covered.">        if (this.direction == 'd') {</span>
+<span class="fc" id="L257">            this.xvel = speed;</span>
+<span class="fc" id="L258">            this.yvel =0;</span>
+        }
+
+<span class="pc bpc" id="L261" title="1 of 2 branches missed.">        if (path[this.y + this.yvel][this.x + this.xvel] == true) {</span>
+<span class="fc" id="L262">            this.x += this.xvel;</span>
+<span class="fc" id="L263">            this.y += this.yvel;</span>
+        }
+<span class="fc" id="L265">    }</span>
+
+    /**
+     * Determines the Straight line distance from the Ghost to the waka
+     * @return the straight line distance determined
+     */
+    public double straightLineDistance() {
+<span class="fc" id="L272">        double tmpx = Math.abs(this.x - this.player_x);</span>
+<span class="fc" id="L273">        double tmpy = Math.abs(this.y - this.player_y);</span>
+
+<span class="fc" id="L275">        return Math.sqrt((tmpx * tmpx) + (tmpy * tmpy));</span>
+        
+    }
+
+    /**
+     * Method for Ghost to determine which way to go at an intersection to reach its desired corner
+     * @return a character array detailing the best moves
+     */
+    public char[] upOrDownCorner() {
+<span class="fc" id="L284">        char[] char_ret = new char[4];</span>
+<span class="fc" id="L285">        int[] corner = new int[2];</span>
+<span class="fc" id="L286">        this.corner_a = corner;</span>
+<span class="fc" id="L287">        corner[0] = 576;</span>
+<span class="fc" id="L288">        corner[1] = 0; </span>
+<span class="fc" id="L289">        int x_diff = this.x - corner[1];</span>
+<span class="fc" id="L290">        int y_diff = this.y - corner[0];</span>
+<span class="fc" id="L291">        int x_diff_f = Math.abs(x_diff);</span>
+<span class="fc" id="L292">        int y_diff_f = Math.abs(y_diff);</span>
+        
+<span class="fc bfc" id="L294" title="All 2 branches covered.">        if (x_diff_f &gt;= y_diff_f) {</span>
+<span class="fc bfc" id="L295" title="All 2 branches covered.">            if (x_diff &gt;= 0 ) {</span>
+<span class="fc" id="L296">                char_ret[0] = 'a';</span>
+<span class="fc" id="L297">                char_ret[1] = 'd';</span>
+            } else {
+<span class="fc" id="L299">                char_ret[0] = 'd';</span>
+<span class="fc" id="L300">                char_ret[1] = 'a';</span>
+            }
+<span class="fc bfc" id="L302" title="All 2 branches covered.">            if (y_diff &gt;= 0 ) {</span>
+<span class="fc" id="L303">                char_ret[2] = 'w';</span>
+<span class="fc" id="L304">                char_ret[3] = 's';</span>
+            } else {
+<span class="fc" id="L306">                char_ret[2] = 's';</span>
+<span class="fc" id="L307">                char_ret[3] = 'w';</span>
+            }
+        } else {
+<span class="fc bfc" id="L310" title="All 2 branches covered.">            if (y_diff &gt;= 0 ) {</span>
+<span class="fc" id="L311">                char_ret[0] = 'w';</span>
+<span class="fc" id="L312">                char_ret[1] = 's';</span>
+            } else {
+<span class="fc" id="L314">                char_ret[0] = 's';</span>
+<span class="fc" id="L315">                char_ret[1] = 'w';</span>
+            }
+<span class="fc bfc" id="L317" title="All 2 branches covered.">            if (x_diff &gt;= 0 ) {</span>
+<span class="fc" id="L318">                char_ret[2] = 'a';</span>
+<span class="fc" id="L319">                char_ret[3] = 'd';</span>
+            } else {
+<span class="fc" id="L321">                char_ret[2] = 'd';</span>
+<span class="fc" id="L322">                char_ret[3] = 'a';</span>
+            }
+        }
+<span class="fc" id="L325">        this.target[1] = 0;</span>
+<span class="fc" id="L326">        this.target[0] = 576;</span>
+<span class="fc" id="L327">        return char_ret;</span>
+
+    }
+
+    /**
+     * Method for Ghost to determine which way to go at an intersection to reach the targeted destination
+     * @return a character array detailing the best moves
+     */
+    public char[] upOrDown() {
+<span class="fc" id="L336">        char[] char_ret = new char[4];</span>
+<span class="fc" id="L337">        int x_diff = this.x - player_x;</span>
+<span class="fc" id="L338">        int x_diff_f = Math.abs(x_diff);</span>
+<span class="fc" id="L339">        int y_diff = this.y - player_y;</span>
+<span class="fc" id="L340">        int y_diff_f = Math.abs(y_diff);</span>
+
+<span class="fc bfc" id="L342" title="All 2 branches covered.">        if (x_diff_f &gt;= y_diff_f) {</span>
+<span class="fc bfc" id="L343" title="All 2 branches covered.">            if (x_diff &gt;= 0 ) {</span>
+<span class="fc" id="L344">                char_ret[0] = 'a';</span>
+<span class="fc" id="L345">                char_ret[1] = 'd';</span>
+            } else {
+<span class="fc" id="L347">                char_ret[0] = 'd';</span>
+<span class="fc" id="L348">                char_ret[1] = 'a';</span>
+            }
+<span class="fc bfc" id="L350" title="All 2 branches covered.">            if (y_diff &gt;= 0 ) {</span>
+<span class="fc" id="L351">                char_ret[2] = 'w';</span>
+<span class="fc" id="L352">                char_ret[3] = 's';</span>
+            } else {
+<span class="fc" id="L354">                char_ret[2] = 's';</span>
+<span class="fc" id="L355">                char_ret[3] = 'w';</span>
+            }
+        } else {
+<span class="fc bfc" id="L358" title="All 2 branches covered.">            if (y_diff &gt;= 0 ) {</span>
+<span class="fc" id="L359">                char_ret[0] = 'w';</span>
+<span class="fc" id="L360">                char_ret[1] = 's';</span>
+            } else {
+<span class="fc" id="L362">                char_ret[0] = 's';</span>
+<span class="fc" id="L363">                char_ret[1] = 'w';</span>
+            }
+<span class="fc bfc" id="L365" title="All 2 branches covered.">            if (x_diff &gt;= 0 ) {</span>
+<span class="fc" id="L366">                char_ret[2] = 'a';</span>
+<span class="fc" id="L367">                char_ret[3] = 'd';</span>
+            } else {
+<span class="fc" id="L369">                char_ret[2] = 'd';</span>
+<span class="fc" id="L370">                char_ret[3] = 'a';</span>
+            }
+        }
+<span class="fc" id="L373">        this.target[1] = this.player_x;</span>
+<span class="fc" id="L374">        this.target[0] = this.player_y;</span>
+
+<span class="fc" id="L376">        return char_ret;</span>
+    }
+
+    /**
+     * Draws the Chaser Object to the screen
+     */
+    public void draw (PApplet app) {
+<span class="pc bpc" id="L383" title="1 of 2 branches missed.">        if (this.isDead == false) {</span>
+<span class="pc bpc" id="L384" title="2 of 4 branches missed.">            if (this.debug &amp; this.isFrightened == false) {</span>
+<span class="nc bnc" id="L385" title="All 2 branches missed.">                if (this.scatter == false) {</span>
+<span class="nc bnc" id="L386" title="All 2 branches missed.">                    if (straightLineDistance() &gt; 8*16){</span>
+<span class="nc" id="L387">                        app.stroke(255, 255, 255);</span>
+<span class="nc" id="L388">                        upOrDown();</span>
+<span class="nc" id="L389">                        app.line(this.x+13, this.y+13, this.target[1]+13, this.target[0]+13);</span>
+                    } else {
+<span class="nc" id="L391">                        app.stroke(255, 255, 255);</span>
+<span class="nc" id="L392">                        upOrDownCorner();</span>
+<span class="nc" id="L393">                        app.line(this.x+13, this.y+13, this.corner_a[1], this.corner_a[0]);</span>
+                    }
+                }
+<span class="nc bnc" id="L396" title="All 2 branches missed.">                else if (this. scatter == true) {</span>
+<span class="nc" id="L397">                    app.stroke(255, 255, 255);</span>
+<span class="nc" id="L398">                    upOrDownCorner();</span>
+<span class="nc" id="L399">                    app.line(this.x+13, this.y+13, this.corner_a[1], this.corner_a[0]);</span>
+                }
+            }
+<span class="pc bpc" id="L402" title="1 of 2 branches missed.">            if (this.isFrightened == true) {</span>
+<span class="nc" id="L403">                app.image(this.ghost_scared, this.x-2, this.y);</span>
+
+<span class="pc bpc" id="L405" title="1 of 2 branches missed.">            } else if (this.sodaEffect == true) {</span>
+<span class="nc" id="L406">                app.image(this.sodaGhost, this.x-2, this.y);</span>
+
+            } else {
+<span class="fc" id="L409">                app.image(this.ghost, this.x-2, this.y);</span>
+            }
+        }
+<span class="fc" id="L412">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

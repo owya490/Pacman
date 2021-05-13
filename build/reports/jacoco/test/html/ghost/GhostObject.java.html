@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GhostObject.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Milestone</a> &gt; <a href="index.source.html" class="el_package">ghost</a> &gt; <span class="el_source">GhostObject.java</span></div><h1>GhostObject.java</h1><pre class="source lang-java linenums">package ghost;
+import java.util.*;
+import java.io.*;
+import processing.core.*;
+import java.util.concurrent.ThreadLocalRandom;
+
+
+<span class="fc" id="L8">public abstract class GhostObject extends MovingEntities {</span>
+    /**
+     * The Ghost's horizontal velocity 
+     */
+    protected int xvel;
+    /**
+     * the Ghost's vertical velocity
+     */
+    protected int yvel;
+
+    /**
+     * The player object
+     */
+    protected Player player_g;
+
+    /**
+     * The player's current X coordinate
+     */
+    protected int player_x;
+    /**
+     * The player's current Y coordinate
+     */
+    protected int player_y;
+
+    /**
+     * Marks if the ghost is currently in scatter mode
+     */
+<span class="fc" id="L35">    protected boolean scatter = true;</span>
+
+    /**
+     * Marks if the ghost is currently in debug mode
+     */
+<span class="fc" id="L40">    protected boolean debug = false;</span>
+    /**
+     * Marks if the ghost is currently effected by Soda
+     */
+<span class="fc" id="L44">    protected boolean sodaEffect = false;</span>
+
+    /** 
+     * The length of the soda effect
+     */
+    protected int sodaLength;
+    /**
+     * The speed which the ghost moves at
+     */
+    protected int speed;
+
+    /**
+     * An list containing a procession for the lengths of Scatter and Chase modes
+     */
+    protected ArrayList&lt;Integer&gt; modeLengths1;
+    /**
+     * An array containing a procession for the lengths of Scatter and Chase modes
+     */
+    protected int[] modeLengths_f;
+    /**
+     * A 2D boolean array marking the traversable path for Entities
+     */
+    protected boolean[][] path;
+    
+    /**
+     * Sprite for frightened ghosts
+     */
+    protected PImage ghost_scared;
+    
+    /**
+     * Sprite for soda affected ghosts
+     */
+    protected PImage sodaGhost;
+
+    /**
+     * List of all other ghost objects in the game
+     */
+    protected ArrayList&lt;GhostObject&gt; other_ghosts;
+
+    /**
+     * Marks if the ghost is dead
+     */
+<span class="fc" id="L86">    protected boolean isDead = false;</span>
+
+    /**
+     * Marks if the ghost is frightened
+     */
+<span class="fc" id="L91">    protected boolean isFrightened = false;</span>
+
+    /**
+     * Marks the length that the frightened effect should last
+     */
+    protected int frightenedLength;
+
+    /**
+     * The amount of frames that has elapsed since the ghost was last frightened
+     */
+    protected int frightenedFrames;
+
+    /**
+     * The amount of frames that has elapsed since the ghost was last affected by soda
+     */
+    protected int sodaFrames;
+
+    /**
+     * The current direction the ghost is travelling in 
+     */
+<span class="fc" id="L111">    protected char direction = 'a';</span>
+
+    /**
+     * Amount of frames that has elapsed
+     */
+<span class="fc" id="L116">    protected int frames = 0;</span>
+    /**
+     * Marks which element the ghost should be in for modeLength array to determine whether in scatter or chase mode
+     */
+<span class="fc" id="L120">    protected int index_scatter = 0;</span>
+
+
+    /**
+     * Gets if the ghost is currently affected by soda
+     * @return if the ghost is affected by soda
+     */
+    public boolean sodaEffectGet() {
+<span class="fc" id="L128">        return this.sodaEffect;</span>
+    }
+
+    /**
+     * Sets the ghost to be affected by soda or not
+     * @param b whether the ghost is affected by soda
+     * @return the new state whether the ghost is affected by soda
+     */
+    public boolean sodaEffectSet(boolean b) {
+<span class="fc" id="L137">        this.sodaEffect = b;</span>
+<span class="fc" id="L138">        return b;</span>
+    }
+
+    /**
+     * Resets the amount of frames elapsed since affected by soda
+     * @return if the reset was successful
+     */
+    public boolean resetSodaFrames() {
+<span class="fc" id="L146">        this.sodaFrames = 0;</span>
+<span class="fc" id="L147">        return true;</span>
+    }
+
+    /**
+     * Sets a new list of GhostObjects of other ghosts in the game
+     * @param o the new list of GhostObjects
+     * @return whehter the new list has been successfully updated
+     */
+    public boolean setOtherGhosts(ArrayList&lt;GhostObject&gt; o) {
+<span class="fc" id="L156">        this.other_ghosts = o;</span>
+<span class="fc" id="L157">        return true;</span>
+    }
+
+    /**
+     * Sets Ghost dead attribute to new state
+     * @param b the new state of dead attribute
+     * @return the new state of the dead attribute
+     */
+    public boolean setDead(boolean b) {
+<span class="fc" id="L166">        this.isDead = b;</span>
+<span class="fc" id="L167">        return b;</span>
+    }
+
+    /**
+     * Sets all of the ghost objects in the game to dead
+     * Sets all of the ghosts objects dead attribute to true
+     * @return whether the update of states has been succesfull
+     */
+    public boolean setAllDead() {
+<span class="fc bfc" id="L176" title="All 2 branches covered.">        for (GhostObject g : other_ghosts) {</span>
+<span class="fc" id="L177">            g.x = g.x_beg;</span>
+<span class="fc" id="L178">            g.y = g.y_beg;</span>
+<span class="fc" id="L179">            g.isDead = false;</span>
+<span class="fc" id="L180">            g.direction = 'a';</span>
+<span class="fc" id="L181">        }</span>
+<span class="fc" id="L182">        return true;</span>
+    }
+
+    /**
+     * Sets the frightened attributes of ghost to new state
+     * @param b the new state for the frightened attribute
+     * @return the new state of the frightened attribute
+     */
+    public boolean setFrightened(boolean b) {
+<span class="fc" id="L191">        this.isFrightened = b;</span>
+<span class="fc" id="L192">        return b;</span>
+    }
+
+    /**
+     * Gets the current state of the frightened attribute
+     * @return the current state of the frightened attribute
+     */
+    public boolean getFrightened() {
+<span class="fc" id="L200">        return this.isFrightened;</span>
+    }
+
+    /**
+     * Resets the elapsed frames since the ghost was last frightened
+     * @return whether the frames has been sucessfully reset
+     */
+    public boolean resetFrightenedFrames() {
+<span class="fc" id="L208">        this.frightenedFrames = 0;</span>
+<span class="fc" id="L209">        return true;</span>
+    }
+
+    /**
+     * Resets the elapsed frames
+     * @return whether the frames has been sucessfully reset
+     */
+    public boolean resetFrames() {
+<span class="fc" id="L217">        this.frames = 0;</span>
+<span class="fc" id="L218">        return true;</span>
+    }
+
+    /**
+     * Resets the scatter index of ghosts reseting the mode types
+     * @return whether if the reset was successful
+     */
+    public boolean resetScatterIndex() {
+<span class="fc" id="L226">        this.index_scatter = 0;</span>
+<span class="fc" id="L227">        return true;</span>
+    }
+
+    /**
+     * Sets the Scatter attribute of ghosts for an exact state
+     * @param b the new state of the scatter attribute
+     * @return the new state of the scatter attribute
+     */
+    public boolean setScatterExact(boolean b) {
+<span class="fc" id="L236">        this.scatter = b;</span>
+<span class="fc" id="L237">        return b;</span>
+    }
+
+    /**
+     * Sets the scatter attribute for the opposite of the previous state
+     * @return whether the update was successful
+     */
+    public boolean setScatter() {
+<span class="fc bfc" id="L245" title="All 2 branches covered.">        this.scatter = !this.scatter;</span>
+<span class="fc" id="L246">        return this.scatter;</span>
+    }
+
+    /**
+     * Sets the debug attribute state to the opposite of the previous state
+     * @return the current state of the debug attribute
+     */
+    public boolean setDebug() {
+<span class="fc bfc" id="L254" title="All 2 branches covered.">        this.debug = !this.debug;</span>
+        //System.out.println(this.debug);
+<span class="fc" id="L256">        return this.debug;</span>
+    }
+
+    /**
+     * Sets the player X coordinates to a new value
+     * @param x the new value for the new position
+     * @return the new X coordinates of the player
+     */
+    public int setPlayerX_g(int x) {
+<span class="fc" id="L265">        this.player_x = x;</span>
+<span class="fc" id="L266">        return this.player_x;</span>
+    }
+
+    /**
+     * Sets the player Y coordinates to a new value
+     * @param y the new value for the new position
+     * @return the new Y coordinates of the player
+     */
+    public int setPlayerY_g(int y) {
+<span class="fc" id="L275">        this.player_y = y;</span>
+<span class="fc" id="L276">        return this.player_y;</span>
+    }
+
+    /**
+     * Abstract Method for Ghost to determine which way to go at an intersection to reach the targeted destination
+     * @return a character array detailing the best moves
+     */
+    public abstract char[] upOrDown();
+
+    /**
+     * Abstract Method for Ghost to determine which way to go at an intersection to reach its desired corner
+     * @return a character array detailing the best moves
+     */
+    public abstract char[] upOrDownCorner();
+
+    /**
+     * To randomly select a turn at a intersection when under the effects of soda
+     * @return the randomly generated charater array of moves
+     */
+    public char[] upOrDownRandom() {
+<span class="fc" id="L296">        char[] char_ret = new char[4];</span>
+<span class="fc bfc" id="L297" title="All 2 branches covered.">        for (int i = 0; i &lt; 4; i ++) {</span>
+<span class="fc" id="L298">            int randomNum = ThreadLocalRandom.current().nextInt(1, 4 + 1);</span>
+<span class="fc bfc" id="L299" title="All 2 branches covered.">            if (randomNum == 1) {</span>
+<span class="fc" id="L300">                char_ret[0] = 'w';</span>
+<span class="fc" id="L301">                char_ret[1] = 'a';</span>
+<span class="fc" id="L302">                char_ret[2] = 's';</span>
+<span class="fc" id="L303">                char_ret[3] = 'd';</span>
+            }
+<span class="fc bfc" id="L305" title="All 2 branches covered.">            if (randomNum == 2) {</span>
+<span class="fc" id="L306">                char_ret[0] = 'a';</span>
+<span class="fc" id="L307">                char_ret[1] = 's';</span>
+<span class="fc" id="L308">                char_ret[2] = 'd';</span>
+<span class="fc" id="L309">                char_ret[3] = 'w';</span>
+            }
+<span class="fc bfc" id="L311" title="All 2 branches covered.">            if (randomNum == 3) {</span>
+<span class="fc" id="L312">                char_ret[0] = 's';</span>
+<span class="fc" id="L313">                char_ret[1] = 'd';</span>
+<span class="fc" id="L314">                char_ret[2] = 'w';</span>
+<span class="fc" id="L315">                char_ret[3] = 'a';            }</span>
+<span class="fc bfc" id="L316" title="All 2 branches covered.">            if (randomNum == 4) {</span>
+<span class="fc" id="L317">                char_ret[0] = 'd';</span>
+<span class="fc" id="L318">                char_ret[1] = 'w';</span>
+<span class="fc" id="L319">                char_ret[2] = 'a';</span>
+<span class="fc" id="L320">                char_ret[3] = 's';            }</span>
+        }
+<span class="fc" id="L322">        return char_ret;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

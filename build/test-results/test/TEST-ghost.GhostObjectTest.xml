@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="ghost.GhostObjectTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2020-11-16T11:40:33" hostname="OWYA-PC" time="0.06">
+  <properties/>
+  <testcase name="scatterTests()" classname="ghost.GhostObjectTest" time="0.002"/>
+  <testcase name="debugTests()" classname="ghost.GhostObjectTest" time="0.007"/>
+  <testcase name="deadTests()" classname="ghost.GhostObjectTest" time="0.002"/>
+  <testcase name="sodaTests()" classname="ghost.GhostObjectTest" time="0.03"/>
+  <testcase name="frightenedTests()" classname="ghost.GhostObjectTest" time="0.002"/>
+  <system-out><![CDATA[red
+red
+red
+red
+red
+red
+red
+red
+red
+7
+red
+red
+red
+red
+red
+red
+red
+red
+red
+red
+red
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

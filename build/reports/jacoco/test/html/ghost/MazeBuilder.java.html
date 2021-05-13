@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MazeBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Milestone</a> &gt; <a href="index.source.html" class="el_package">ghost</a> &gt; <span class="el_source">MazeBuilder.java</span></div><h1>MazeBuilder.java</h1><pre class="source lang-java linenums">package ghost;
+import java.util.*;
+import java.io.*;
+
+import processing.core.*;
+import processing.core.PApplet;
+import processing.core.PImage;
+
+public class MazeBuilder extends PApplet{
+    /**
+     * The 2D ArrayList of cells for the map
+     */
+    private ArrayList&lt;String[]&gt; lines;
+
+    // private static final int WIDTH = 448;
+    // private static final int HEIGHT = 576;
+
+    /**
+     * The sprite for the a corner facing down left
+     */
+    public PImage downLeft;
+    /**
+     * The sprite for the a corner facing down right
+     */
+    private PImage downRight;
+    /**
+     * The sprite for the a horizontal wall
+     */
+    private PImage horizontal;
+    /**
+     * The sprite for the a corner facing up left
+     */
+    public PImage upLeft;
+    /**
+     * The sprite for the a corner facing up right
+     */
+    public PImage upRight;
+    /**
+     * The sprite for the a vertical wall
+     */
+    private PImage vertical;
+    /**
+     * The sprite for a fruit object
+     */
+    private PImage fruit;
+    /**
+     * The sprite for a superFruit object
+     */
+    private PImage superFruit;
+    /**
+     * The sprite for a soda object
+     */
+    private PImage soda;
+
+    /**
+     * An arraylist of all the fruit objects on the map
+     */
+    public ArrayList&lt;Fruit&gt; fruitList;
+    /**
+     * An arraylist of all the superFruit objects on the map
+     */
+    public ArrayList&lt;superFruit&gt; superFruitList;
+    /**
+     * An arraylist of all the soda objects on the map
+     */
+    public ArrayList&lt;soda&gt; sodaList;
+
+    /**
+     * The constructor the the Mazebuilder object receiving all the sprites
+     * @param filename The filename for the map file (map.txt)
+     * @param downLeft The downLeft sprite
+     * @param downRight The downRight sprite
+     * @param horizontal The horizontal sprite
+     * @param upLeft The upLeft sprite
+     * @param upRight The upRight sprite
+     * @param vertical The vertical sprite
+     * @param fruit The fruit sprite
+     * @param superFruit The superFruit sprite
+     * @param soda The soda sprite
+     */
+<span class="fc" id="L81">    public MazeBuilder(String filename, PImage downLeft, PImage downRight, PImage horizontal, PImage upLeft, PImage upRight, PImage vertical, PImage fruit, PImage superFruit, PImage soda) {</span>
+<span class="fc" id="L82">        this.downLeft = downLeft;</span>
+<span class="fc" id="L83">        this.downRight = downRight;</span>
+<span class="fc" id="L84">        this.horizontal = horizontal;</span>
+<span class="fc" id="L85">        this.upLeft = upLeft;</span>
+<span class="fc" id="L86">        this.upRight = upRight;</span>
+<span class="fc" id="L87">        this.vertical = vertical;</span>
+<span class="fc" id="L88">        this.fruit = fruit;</span>
+<span class="fc" id="L89">        this.superFruit = superFruit;</span>
+<span class="fc" id="L90">        this.lines = fileReader.readLines(filename);</span>
+<span class="fc" id="L91">        this.soda = soda;</span>
+
+<span class="fc" id="L93">    }</span>
+
+    /**
+     * Searches the map for fruit objects and creates new fruit objects with the correct coordinates
+     * @return An arraylist of all the fruit objects on the map
+     */
+    public ArrayList&lt;Fruit&gt; fruitList(){
+<span class="fc" id="L100">        ArrayList&lt;Fruit&gt; tmpList = new ArrayList&lt;Fruit&gt;();</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">        for (int y = 0; y &lt; this.lines.size(); y ++) {</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">            for (int x = 0; x &lt; this.lines.get(y).length; x ++) {</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">                if (this.lines.get(y)[x].equals(&quot;7&quot;)) {</span>
+<span class="fc" id="L104">                    Fruit tmp = new Fruit(x*16, y*16, this.fruit);</span>
+<span class="fc" id="L105">                    tmpList.add(tmp);</span>
+                }
+            }
+        }
+<span class="fc" id="L109">        this.fruitList = tmpList;</span>
+<span class="fc" id="L110">        return tmpList;</span>
+    }
+
+    /**
+     * Searches the map for soda objects and creates new soda objects with the correct coordinates
+     * @return An arraylist of all the soda objects on the map
+     */
+    public ArrayList&lt;soda&gt; sodaList(){
+<span class="fc" id="L118">        ArrayList&lt;soda&gt; tmpList = new ArrayList&lt;soda&gt;();</span>
+<span class="fc bfc" id="L119" title="All 2 branches covered.">        for (int y = 0; y &lt; this.lines.size(); y ++) {</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">            for (int x = 0; x &lt; this.lines.get(y).length; x ++) {</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">                if (this.lines.get(y)[x].equals(&quot;s&quot;)) {</span>
+<span class="fc" id="L122">                    soda tmp = new soda(x*16, y*16, this.soda);</span>
+                    //System.out.println(&quot;f&quot;);
+<span class="fc" id="L124">                    tmpList.add(tmp);</span>
+                }
+            }
+        }
+<span class="fc" id="L128">        this.sodaList = tmpList;</span>
+<span class="fc" id="L129">        return tmpList;</span>
+    }
+
+    /**
+     * Searches the map for superFruit objects and creates new superFruit objects with the correct coordinates
+     * @return An arraylist of all the superFruit objects on the map
+     */
+    public ArrayList&lt;superFruit&gt; superFruitList(){
+<span class="fc" id="L137">        ArrayList&lt;superFruit&gt; tmpList = new ArrayList&lt;superFruit&gt;();</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">        for (int y = 0; y &lt; this.lines.size(); y ++) {</span>
+<span class="fc bfc" id="L139" title="All 2 branches covered.">            for (int x = 0; x &lt; this.lines.get(y).length; x ++) {</span>
+<span class="fc bfc" id="L140" title="All 2 branches covered.">                if (this.lines.get(y)[x].equals(&quot;8&quot;)) {</span>
+<span class="fc" id="L141">                    superFruit tmp = new superFruit(x*16, y*16, this.superFruit);</span>
+                    //System.out.println(&quot;f&quot;);
+<span class="fc" id="L143">                    tmpList.add(tmp);</span>
+                }
+            }
+        }
+<span class="fc" id="L147">        this.superFruitList = tmpList;</span>
+<span class="fc" id="L148">        return tmpList;</span>
+    }
+
+    /**
+     * Checks if the all the fruit objects are eaten
+     * @return whether or not all the fruit objects have been eaten
+     */
+    public boolean checkFruitListDone() {
+<span class="fc" id="L156">        int total = 0;</span>
+<span class="fc bfc" id="L157" title="All 2 branches covered.">        for (Fruit f : this.fruitList) {</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">            if (f.eaten == true) {</span>
+<span class="fc" id="L159">                total ++;</span>
+            }
+<span class="fc" id="L161">        }</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">        if (total == this.fruitList.size()) {</span>
+<span class="fc" id="L163">            return true;</span>
+        } else {
+<span class="fc" id="L165">            return false;</span>
+        }
+    }
+
+    /**
+     * Checks if the all the superFruit objects are eaten
+     * @return whether or not all the superFruit objects have been eaten
+     */
+    public boolean checkSuperFruitListDone() {
+<span class="fc" id="L174">        int total = 0;</span>
+<span class="fc bfc" id="L175" title="All 2 branches covered.">        for (superFruit f : this.superFruitList) {</span>
+<span class="fc bfc" id="L176" title="All 2 branches covered.">            if (f.eaten == true) {</span>
+<span class="fc" id="L177">                total ++;</span>
+            }
+<span class="fc" id="L179">        }</span>
+<span class="fc bfc" id="L180" title="All 2 branches covered.">        if (total == this.superFruitList.size()) {</span>
+<span class="fc" id="L181">            return true;</span>
+        } else {
+<span class="fc" id="L183">            return false;</span>
+        }
+    }
+
+    /**
+     * Draws to the screen the map based off the map.txt file
+     * @param app the app which it will draw to the screen through
+     */
+    public void draw(PApplet app) {
+<span class="fc bfc" id="L192" title="All 2 branches covered.">        for (int y = 0; y &lt; this.lines.size(); y ++) {</span>
+<span class="fc bfc" id="L193" title="All 2 branches covered.">            for (int x = 0; x &lt; this.lines.get(y).length; x ++) {</span>
+<span class="fc bfc" id="L194" title="All 2 branches covered.">                if (this.lines.get(y)[x].equals(&quot;0&quot;)) {</span>
+<span class="fc" id="L195">                    continue;</span>
+                }
+<span class="fc bfc" id="L197" title="All 2 branches covered.">                if (this.lines.get(y)[x].equals(&quot;6&quot;)) {</span>
+<span class="fc" id="L198">                    app.image(this.downRight, x*16,y*16);</span>
+                }
+<span class="fc bfc" id="L200" title="All 2 branches covered.">                if (this.lines.get(y)[x].equals(&quot;1&quot;)) {</span>
+<span class="fc" id="L201">                    app.image(this.horizontal, x*16,y*16);</span>
+                }
+<span class="fc bfc" id="L203" title="All 2 branches covered.">                if (this.lines.get(y)[x].equals(&quot;5&quot;)) {</span>
+<span class="fc" id="L204">                    app.image(this.downLeft, x*16,y*16);</span>
+                }
+<span class="fc bfc" id="L206" title="All 2 branches covered.">                if (this.lines.get(y)[x].equals(&quot;2&quot;)) {</span>
+<span class="fc" id="L207">                    app.image(this.vertical, x*16,y*16);</span>
+                }
+<span class="fc bfc" id="L209" title="All 2 branches covered.">                if (this.lines.get(y)[x].equals(&quot;4&quot;)) {</span>
+<span class="fc" id="L210">                    app.image(this.upRight, x*16,y*16);</span>
+                }
+<span class="fc bfc" id="L212" title="All 2 branches covered.">                if (this.lines.get(y)[x].equals(&quot;3&quot;)) {</span>
+<span class="fc" id="L213">                    app.image(this.upLeft, x*16,y*16);</span>
+                }
+<span class="fc bfc" id="L215" title="All 2 branches covered.">                if (this.lines.get(y)[x].equals(&quot;7&quot;)) {</span>
+
+<span class="fc bfc" id="L217" title="All 2 branches covered.">                    for (Fruit f : fruitList){</span>
+<span class="fc bfc" id="L218" title="All 8 branches covered.">                        if (((f.getX() + 4)/16) == x &amp; ((f.getY() + 5)/16) == y &amp; f.eaten == false) {</span>
+<span class="fc" id="L219">                            app.image(this.fruit, x*16,y*16);</span>
+                        } 
+<span class="fc" id="L221">                    }</span>
+                }
+<span class="fc bfc" id="L223" title="All 2 branches covered.">                if (this.lines.get(y)[x].equals(&quot;8&quot;)) {</span>
+
+<span class="fc bfc" id="L225" title="All 2 branches covered.">                    for (superFruit f : superFruitList){</span>
+<span class="pc bpc" id="L226" title="1 of 8 branches missed.">                        if (((f.getX() + 4)/16) == x &amp; ((f.getY() + 5)/16) == y &amp; f.eaten == false) {</span>
+<span class="fc" id="L227">                            app.image(this.superFruit, x*16,y*16);</span>
+                        } 
+<span class="fc" id="L229">                    }</span>
+                }
+<span class="fc bfc" id="L231" title="All 2 branches covered.">                if (this.lines.get(y)[x].equals(&quot;s&quot;)) {</span>
+<span class="fc bfc" id="L232" title="All 2 branches covered.">                    for (soda s : sodaList){</span>
+<span class="pc bpc" id="L233" title="4 of 8 branches missed.">                        if (((s.getX() + 4)/16) == x &amp; ((s.getY() + 5)/16) == y &amp; s.eaten == false) {</span>
+<span class="fc" id="L234">                            app.image(this.soda, x*16,y*16);</span>
+                        } 
+<span class="fc" id="L236">                    }</span>
+                }
+            }
+        }
+<span class="fc" id="L240">    }</span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
